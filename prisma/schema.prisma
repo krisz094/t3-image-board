@@ -64,3 +64,30 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
+model Board {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  threads     Thread[]
+}
+
+model Thread {
+  id        String    @id @default(cuid())
+  text      String
+  image     String?
+  timestamp DateTime
+  board     Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  boardId   String
+  comments  Comment[]
+  updatedAt DateTime?
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String
+  image     String?
+  timestamp DateTime
+  thread    Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  threadId  String
+}
