@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PrettyDateComment as PrettyDateTimeComment } from "../../utils/prettyDate";
 
 export interface ReplyProps {
@@ -32,6 +32,11 @@ export function Comment({
 }: ReplyProps) {
   const [imgDim, setImgDim] = useState({ w: 200, h: 200 });
   const [imgExt, setImgExt] = useState(false);
+
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <div className="flex gap-1">
@@ -71,7 +76,7 @@ export function Comment({
             ) : (
               <div className="font-bold text-green-700">Anonymous</div>
             )}
-            <div>{PrettyDateTimeComment(timestamp)}</div>
+            {isMounted && <div>{PrettyDateTimeComment(timestamp)}</div>}
             <div className="text-red-700">#{id}</div>
             {boardName && (
               <Link href={`/${boardName}/thread/${id}`}>
