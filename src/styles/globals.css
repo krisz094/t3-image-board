@@ -1,3 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+body {
+  font-family: "Open Sans";
+}
+
+@layer base {
+  body {
+    @apply min-h-[100vh] bg-gradient-to-b from-blue-100 to-blue-200 ;
+  }
+}

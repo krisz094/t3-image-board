@@ -1,9 +1,10 @@
-import { type AppType } from "next/app";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
+import { type AppType } from "next/app";
 
 import { trpc } from "../utils/trpc";
 
+import "@fontsource/open-sans";
 import "../styles/globals.css";
 
 const MyApp: AppType<{ session: Session | null }> = ({

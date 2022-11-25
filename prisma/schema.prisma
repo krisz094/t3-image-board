@@ -55,6 +55,8 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  threads       Thread[]
+  comments      Comment[]
 }
 
 model VerificationToken {
@@ -74,6 +76,8 @@ model Board {
 
 model Thread {
   id        String    @id @default(cuid())
+  author    User      @relation(fields: [userId], references: [id])
+  subject   String?
   text      String
   image     String?
   timestamp DateTime
@@ -81,13 +85,16 @@ model Thread {
   boardId   String
   comments  Comment[]
   updatedAt DateTime?
+  userId    String
 }
 
 model Comment {
   id        String   @id @default(cuid())
+  author    User     @relation(fields: [userId], references: [id])
   text      String
   image     String?
   timestamp DateTime
   thread    Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
   threadId  String
+  userId    String
 }
