@@ -15,7 +15,7 @@ function CatalogComponent({ boardName }: CatalogComponentProps) {
 
   return (
     <div className="w-full space-y-2 p-2">
-      <BoardsHead />
+      <BoardsHead isCatalog />
 
       <h1 className="w-full text-center text-3xl font-bold">
         <span className="font-bold">/{boardQ.data?.name}/</span>
@@ -45,6 +45,10 @@ function CatalogComponent({ boardName }: CatalogComponentProps) {
       </div>
 
       <HorizontalLine />
+
+      {catalogQ.data?.length === 0 && (
+        <div className="w-full text-center">No threads yet</div>
+      )}
 
       <div
         style={{

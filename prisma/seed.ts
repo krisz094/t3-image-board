@@ -16,12 +16,56 @@ async function main() {
 
   await prisma.board.upsert({
     where: {
+      name: "biz",
+    },
+    update: {},
+    create: {
+      name: "biz",
+      description: "Business",
+    },
+  });
+
+  await prisma.board.upsert({
+    where: {
       name: "g",
     },
     update: {},
     create: {
       name: "g",
       description: "Technology",
+    },
+  });
+
+  await prisma.board.upsert({
+    where: {
+      name: "mu",
+    },
+    update: {},
+    create: {
+      name: "mu",
+      description: "Music",
+    },
+  });
+
+  await prisma.board.upsert({
+    where: {
+      name: "tv",
+    },
+    update: {},
+    create: {
+      name: "tv",
+      description: "Television & Film",
+    },
+  });
+
+  await prisma.board.upsert({
+    where: {
+      name: "sp",
+    },
+    update: {},
+    create: {
+      name: "sp",
+      description: "Sports",
     },
   });
 
