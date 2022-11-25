@@ -34,21 +34,21 @@ const ThreadComponent = memo(function ThreadComp({ threadId, boardName }: { thre
 
             <div className="flex gap-2">
                 <div>
-                    <span /* className="mr-1" */>[</span>
+                    <span >[</span>
                     <Link href={`/${boardName}`} ><span className="cursor-pointer hover:text-red-500">Home</span></Link>
-                    <span /* className="ml-1" */>]</span>
+                    <span >]</span>
                 </div>
 
                 <div>
-                    <span /* className="mr-1" */>[</span>
+                    <span >[</span>
                     <Link href={`/${boardName}/catalog`} ><span className="cursor-pointer hover:text-red-500">Catalog</span></Link>
-                    <span /* className="ml-1" */>]</span>
+                    <span >]</span>
                 </div>
 
                 <div>
-                    <span /* className="mr-1" */>[</span>
+                    <span >[</span>
                     <Link href={`/${boardName}/archive`} ><span className="cursor-pointer hover:text-red-500">Archive</span></Link>
-                    <span /* className="ml-1" */>]</span>
+                    <span >]</span>
                 </div>
             </div>
 

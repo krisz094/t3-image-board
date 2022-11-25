@@ -11,10 +11,10 @@ export const boardsRouter = router({
   }),
   getCatalogThreads: publicProcedure
     .input(z.object({ boardName: z.string() }))
-    .query(({ ctx, input }) => {
+    .query(async ({ ctx, input }) => {
       const take = THREAD_PER_PAGE * PAGES_BEFORE_ARCHIVE;
 
-      return ctx.prisma.thread.findMany({
+      const asd = await ctx.prisma.thread.findMany({
         take,
         where: {
           board: {
@@ -24,9 +24,20 @@ export const boardsRouter = router({
           },
         },
         include: {
-          author: true,
+          comments: {
+            select: {
+              id: true,
+              image: true
+            }
+          },
+          author: true
+        },
+        orderBy: {
+          updatedAt: 'desc'
         },
       });
+
+      return asd;
     }),
   getArchiveThreads: publicProcedure
     .input(z.object({ boardName: z.string() }))
