@@ -6,13 +6,14 @@ import { useState } from "react";
 export interface ReplyProps {
     id: string;
     timestamp: Date;
-    text: string;
+    text?: string | null;
     image?: string | null;
     boardName?: string;
     isReply?: boolean;
+    author?: { id: string, name: string }
 }
 
-export function Comment({ id, image, text, timestamp, boardName, isReply = false }: ReplyProps) {
+export function Comment({ id, image, text, timestamp, boardName, isReply = false, author }: ReplyProps) {
 
     const [imgDim, setImgDim] = useState({ w: 200, h: 200 });
     const [imgExt, setImgExt] = useState(false);
@@ -21,14 +22,14 @@ export function Comment({ id, image, text, timestamp, boardName, isReply = false
         <div className="flex gap-1">
             {isReply && <div>{">>"}</div>}
             <div className={clsx("p-2 flex gap-2 flex-wrap", {
-                'bg-blue-400/80 rounded-sm shadow-md': isReply,
+                'bg-blue-300/80 rounded-sm shadow-md': isReply,
                 'flex-col': imgExt
             })}>
                 {image && (
                     <Image
                         src={image}
                         alt="Post image"
-                        width={imgExt ? imgDim.w : Math.min(200, imgDim.w) }
+                        width={imgExt ? imgDim.w : Math.min(200, imgDim.w)}
                         height={imgExt ? imgDim.h : Math.min(200, imgDim.h)}
                         className="object-contain cursor-pointer"
                         onClick={e => {
@@ -46,6 +47,7 @@ export function Comment({ id, image, text, timestamp, boardName, isReply = false
                 <div className="flex-1 flex flex-col gap-2">
 
                     <div className="flex justify-between gap-2 text-sm font-bold flex-wrap">
+                        {author ? <div></div> : <div className="text-green-700">Anonymous</div>}
                         <div>{timestamp.toLocaleDateString()} {timestamp.toLocaleTimeString()}</div>
                         <div>{id}</div>
                         {boardName && <Link href={`/${boardName}/thread/${id}`}>

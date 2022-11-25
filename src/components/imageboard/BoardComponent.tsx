@@ -1,53 +1,18 @@
 import clsx from "clsx";
-import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import type { ChangeEventHandler } from "react";
-import { memo, useCallback, useRef, useState } from "react";
+import { memo } from "react";
 import { trpc } from "../../utils/trpc";
 import { BoardsHead } from "./BoardsHead";
 import { Comment } from "./Comment";
 import { HorizontalLine } from "./HorizontalLine";
+import ThreadCompose from "./ThreadCompose";
 
 const BoardComponent = memo(function BoardComp({ pageNum, boardName }: { pageNum: number, boardName: string }) {
-    const router = useRouter();
 
     const boardQ = trpc.boards.getByName.useQuery({ boardName });
     const pageNumQ = trpc.boards.getPageNum.useQuery({ boardName });
     const threadsQ = trpc.boards.getPage.useQuery({ boardName, pageNum });
-    const createThreadMut = trpc.threads.create.useMutation();
 
-    const [txt, setTxt] = useState('');
-    const [sub, setSub] = useState('');
-    const [img, setImg] = useState('');
-
-    const fileRef = useRef<HTMLInputElement>(null);
-
-    const submit = useCallback(async () => {
-        const th = await createThreadMut.mutateAsync({
-            boardName,
-            text: txt,
-            image: img.trim() || null
-        });
-
-        setTxt('');
-
-        router.push(`/${boardName}/thread/${th.id}`)
-
-    }, [boardName, createThreadMut, img, router, txt]);
-
-    const changeFile: ChangeEventHandler<HTMLInputElement> = useCallback(e => {
-        const file = e.target.files ? e.target.files[0] : null;
-        if (file && ['image/jpeg', 'image/png'].includes(file.type)) {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => setImg(reader.result as string);
-            reader.onerror = () => setImg('');
-        }
-        else {
-            setImg('');
-        }
-    }, []);
 
     if (boardQ.isLoading) {
         return <div className=" p-2 space-y-2">Loading...</div>
@@ -67,28 +32,7 @@ const BoardComponent = memo(function BoardComp({ pageNum, boardName }: { pageNum
                 <span>{boardQ.data?.description}</span>
             </h1>
 
-            <form onSubmit={e => { e.preventDefault(); submit(); }} className="flex flex-col gap-1.5 items-center px-2">
-                {img && (
-                    <div className="w-[200px] h-[200px] rounded-md overflow-hidden relative">
-                        <Image src={img} layout="fill" className="object-contain" alt="Uploaded image" />
-                        <div
-                            className="text-xs bg-black/50 absolute bottom-1 right-1 text-white rounded-md px-2 py-1 cursor-pointer"
-                            onClick={() => {
-                                setImg('');
-                                if (fileRef.current) {
-                                    fileRef.current.value = '';
-                                }
-                            }}>
-                            Clear
-                        </div>
-                    </div>
-                )}
-
-                <input type="text" placeholder="Subject" value={sub} onChange={e => setSub(e.target.value)} className="outline-none p-1 rounded-sm shadow-md w-full max-w-[400px]" />
-                <textarea placeholder="Thread text" value={txt} onChange={e => setTxt(e.target.value)} className="outline-none p-1 resize-none rounded-sm shadow-md aspect-video w-full max-w-[400px]" />
-                <input ref={fileRef} type="file" onChange={changeFile} accept="image/jpeg,image/png" />
-                <input type="submit" value={"Create thread"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50" />
-            </form>
+            <ThreadCompose boardName={boardName} />
 
             <HorizontalLine />
 

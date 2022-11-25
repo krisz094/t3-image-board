@@ -76,25 +76,25 @@ model Board {
 
 model Thread {
   id        String    @id @default(cuid())
-  author    User      @relation(fields: [userId], references: [id])
+  author    User?     @relation(fields: [userId], references: [id])
   subject   String?
-  text      String
-  image     String?
+  text      String?
+  image     String
   timestamp DateTime
   board     Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
   boardId   String
   comments  Comment[]
   updatedAt DateTime?
-  userId    String
+  userId    String?
 }
 
 model Comment {
   id        String   @id @default(cuid())
-  author    User     @relation(fields: [userId], references: [id])
-  text      String
+  author    User?    @relation(fields: [userId], references: [id])
+  text      String?
   image     String?
   timestamp DateTime
   thread    Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
   threadId  String
-  userId    String
+  userId    String?
 }

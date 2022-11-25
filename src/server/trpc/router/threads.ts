@@ -7,7 +7,8 @@ export const threadsRouter = router({
       z.object({
         boardName: z.string(),
         text: z.string().min(1, { message: "Post cannot be empty" }),
-        image: z.string().nullable(),
+        image: z.string(),
+        subject: z.string().nullable(),
       })
     )
     .mutation(({ ctx, input }) => {
