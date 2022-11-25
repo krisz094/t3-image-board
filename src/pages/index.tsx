@@ -30,7 +30,6 @@ export async function getServerSideProps(
 }
 
 const Home: NextPage = () => {
-
   const boardsQ = trpc.boards.getAll.useQuery();
 
   return (

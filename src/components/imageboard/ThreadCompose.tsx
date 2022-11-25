@@ -20,16 +20,22 @@ function ThreadCompose({ boardName }: ThreadComposeProps) {
     const fileRef = useRef<HTMLInputElement>(null);
 
     const submit = useCallback(async () => {
-        const th = await createThreadMut.mutateAsync({
-            boardName,
-            text: txt,
-            image: img.trim(),
-            subject: sub.trim() || null
-        });
+        try {
 
-        setTxt('');
+            const th = await createThreadMut.mutateAsync({
+                boardName,
+                text: txt,
+                image: img.trim(),
+                subject: sub.trim() || null
+            });
 
-        router.push(`/${boardName}/thread/${th.id}`)
+            setTxt('');
+
+            router.push(`/${boardName}/thread/${th.id}`)
+        }
+        catch (err) {
+            console.log('new thread err');
+        }
 
     }, [boardName, createThreadMut, img, router, sub, txt]);
 
@@ -46,28 +52,30 @@ function ThreadCompose({ boardName }: ThreadComposeProps) {
         }
     }, []);
     return (
-        <form onSubmit={e => { e.preventDefault(); submit(); }} className="flex flex-col gap-1.5 items-center px-2">
-            {img && (
-                <div className="w-[200px] h-[200px] rounded-md overflow-hidden relative">
-                    <Image src={img} layout="fill" className="object-contain" alt="Uploaded image" />
-                    <div
-                        className="text-xs bg-black/50 absolute bottom-1 right-1 text-white rounded-md px-2 py-1 cursor-pointer"
-                        onClick={() => {
-                            setImg('');
-                            if (fileRef.current) {
-                                fileRef.current.value = '';
-                            }
-                        }}>
-                        Clear
+        <>
+            <form onSubmit={e => { e.preventDefault(); submit(); }} className="flex flex-col gap-1.5 items-center px-2">
+                {img && (
+                    <div className="w-[200px] h-[200px] rounded-md overflow-hidden relative">
+                        <Image src={img} layout="fill" className="object-contain" alt="Uploaded image" />
+                        <div
+                            className="text-xs bg-black/50 absolute bottom-1 right-1 text-white rounded-md px-2 py-1 cursor-pointer"
+                            onClick={() => {
+                                setImg('');
+                                if (fileRef.current) {
+                                    fileRef.current.value = '';
+                                }
+                            }}>
+                            Clear
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            <input type="text" placeholder="Subject" value={sub} onChange={e => setSub(e.target.value)} className="outline-none p-1 rounded-sm shadow-md w-full max-w-[400px]" />
-            <textarea placeholder="Thread text" value={txt} onChange={e => setTxt(e.target.value)} className="outline-none p-1 resize-none rounded-sm shadow-md aspect-video w-full max-w-[400px]" />
-            <input ref={fileRef} type="file" onChange={changeFile} accept="image/jpeg,image/png" />
-            <input type="submit" value={"Create thread"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50" />
-        </form>
+                <input type="text" placeholder="Subject" value={sub} onChange={e => setSub(e.target.value)} className="outline-none p-1 rounded-sm shadow-md w-full max-w-[400px]" />
+                <textarea placeholder="Thread text" value={txt} onChange={e => setTxt(e.target.value)} className="outline-none p-1 resize-none rounded-sm shadow-md aspect-video w-full max-w-[400px]" />
+                <input ref={fileRef} type="file" onChange={changeFile} accept="image/jpeg,image/png" />
+                <input type="submit" value={"Create thread"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50" />
+            </form>
+        </>
     )
 }
 

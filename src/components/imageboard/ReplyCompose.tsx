@@ -30,43 +30,51 @@ function ReplyCompose({ threadId }: Props) {
     }, []);
 
     const submit = useCallback(async () => {
-        await replyMut.mutateAsync({
-            threadId,
-            text: txt,
-            image: img,
-        })
+        try {
+            await replyMut.mutateAsync({
+                threadId,
+                text: txt.trim() || null,
+                image: img.trim() || null,
+            })
 
-        setTxt('');
-        setImg('');
-        if (fileRef.current) {
-            fileRef.current.value = '';
+            setTxt('');
+            setImg('');
+            if (fileRef.current) {
+                fileRef.current.value = '';
+            }
+
+            await tCtx.threads.getById.refetch({ id: threadId });
         }
-
-        await tCtx.threads.getById.refetch({ id: threadId });
-    }, [replyMut, tCtx.threads.getById, threadId, txt]);
+        catch (err) {
+            console.log('reply err')
+        }
+    }, [img, replyMut, tCtx.threads.getById, threadId, txt]);
 
     return (
-        <form onSubmit={e => { e.preventDefault(); submit(); }} className="flex flex-col gap-1.5 items-center px-2">
-            {img && (
-                <div className="w-[200px] h-[200px] rounded-md overflow-hidden relative">
-                    <Image src={img} layout="fill" className="object-contain" alt="Uploaded image" />
-                    <div
-                        className="text-xs bg-black/50 absolute bottom-1 right-1 text-white rounded-md px-2 py-1 cursor-pointer"
-                        onClick={() => {
-                            setImg('');
-                            if (fileRef.current) {
-                                fileRef.current.value = '';
-                            }
-                        }}>
-                        Clear
+        <>
+            <form onSubmit={e => { e.preventDefault(); submit(); }} className="flex flex-col gap-1.5 items-center px-2">
+                {img && (
+                    <div className="w-[200px] h-[200px] rounded-md overflow-hidden relative">
+                        <Image src={img} layout="fill" className="object-contain" alt="Uploaded image" />
+                        <div
+                            className="text-xs bg-black/50 absolute bottom-1 right-1 text-white rounded-md px-2 py-1 cursor-pointer"
+                            onClick={() => {
+                                setImg('');
+                                if (fileRef.current) {
+                                    fileRef.current.value = '';
+                                }
+                            }}>
+                            Clear
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            <textarea placeholder="Thread text" value={txt} onChange={e => setTxt(e.target.value)} className="outline-none p-1 resize-none rounded-sm shadow-md aspect-video w-full max-w-[400px]" />
-            <input ref={fileRef} type="file" onChange={changeFile} accept="image/jpeg,image/png" />
-            <input type="submit" value={"Add reply"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50" />
-        </form>
+                <textarea placeholder="Reply text" value={txt} onChange={e => setTxt(e.target.value)} className="outline-none p-1 resize-none rounded-sm shadow-md aspect-video w-full max-w-[400px]" />
+                <input ref={fileRef} type="file" onChange={changeFile} accept="image/jpeg,image/png" />
+                <input type="submit" value={"Add reply"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50" />
+            </form>
+            {replyMut.error?.message}
+        </>
     )
 }
 

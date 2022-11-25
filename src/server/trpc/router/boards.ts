@@ -2,11 +2,53 @@ import { z } from "zod";
 import { publicProcedure, router } from "../trpc";
 
 const THREAD_PER_PAGE = 10;
+const PAGES_BEFORE_ARCHIVE = 10;
+const MAX_ARCHIVE_THREADS = 100;
 
 export const boardsRouter = router({
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.board.findMany();
   }),
+  getCatalogThreads: publicProcedure
+    .input(z.object({ boardName: z.string() }))
+    .query(({ ctx, input }) => {
+      const take = THREAD_PER_PAGE * PAGES_BEFORE_ARCHIVE;
+
+      return ctx.prisma.thread.findMany({
+        take,
+        where: {
+          board: {
+            name: {
+              equals: input.boardName,
+            },
+          },
+        },
+        include: {
+          author: true,
+        },
+      });
+    }),
+  getArchiveThreads: publicProcedure
+    .input(z.object({ boardName: z.string() }))
+    .query(({ ctx, input }) => {
+      const skip = THREAD_PER_PAGE * PAGES_BEFORE_ARCHIVE;
+      const take = MAX_ARCHIVE_THREADS;
+
+      return ctx.prisma.thread.findMany({
+        skip,
+        take,
+        where: {
+          board: {
+            name: {
+              equals: input.boardName,
+            },
+          },
+        },
+        include: {
+          author: true,
+        },
+      });
+    }),
   getByName: publicProcedure
     .input(z.object({ boardName: z.string() }))
     .query(({ ctx, input }) => {
@@ -37,7 +79,7 @@ export const boardsRouter = router({
 
       return ctx.prisma.thread.findMany({
         orderBy: {
-          updatedAt: 'desc'
+          updatedAt: "desc",
         },
         skip: skip,
         take: THREAD_PER_PAGE,
@@ -55,6 +97,7 @@ export const boardsRouter = router({
             },
             take: 3,
           },
+          author: true,
         },
       });
     }),

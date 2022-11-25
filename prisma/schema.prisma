@@ -76,7 +76,7 @@ model Board {
 
 model Thread {
   id        String    @id @default(cuid())
-  author    User?     @relation(fields: [userId], references: [id])
+  author    User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   subject   String?
   text      String?
   image     String
@@ -90,7 +90,7 @@ model Thread {
 
 model Comment {
   id        String   @id @default(cuid())
-  author    User?    @relation(fields: [userId], references: [id])
+  author    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   text      String?
   image     String?
   timestamp DateTime

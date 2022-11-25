@@ -6,12 +6,14 @@ export const threadsRouter = router({
     .input(
       z.object({
         boardName: z.string(),
-        text: z.string().min(1, { message: "Post cannot be empty" }),
-        image: z.string(),
+        text: z.string().min(1, { message: "Thread text cannot be empty" }),
+        image: z.string().min(1, { message: "Thread image cannot be empty" }),
         subject: z.string().nullable(),
       })
     )
     .mutation(({ ctx, input }) => {
+      const currUserId = ctx.session?.user?.id;
+
       return ctx.prisma.thread.create({
         data: {
           image: input.image,
@@ -21,6 +23,12 @@ export const threadsRouter = router({
           board: {
             connect: {
               name: input.boardName,
+            },
+          },
+          subject: input.subject,
+          author: {
+            connect: {
+              id: currUserId,
             },
           },
         },
@@ -37,24 +45,30 @@ export const threadsRouter = router({
         },
         include: {
           comments: true,
+          author: true,
         },
       });
     }),
   reply: publicProcedure
     .input(
-      z.object({
-        threadId: z.string(),
-        text: z.string(),
-        image: z.string().nullable(),
-      })
+      z
+        .object({
+          threadId: z.string(),
+          text: z.string().nullable(),
+          image: z.string().min(1).nullable(),
+        })
+        .refine((data) => !!data.text || !!data.image)
     )
     .mutation(async ({ ctx, input }) => {
+      const currUserId = ctx.session?.user?.id;
+
       const com = await ctx.prisma.comment.create({
         data: {
           text: input.text,
           image: input.image,
           timestamp: new Date(),
           threadId: input.threadId,
+          userId: currUserId,
         },
       });
 

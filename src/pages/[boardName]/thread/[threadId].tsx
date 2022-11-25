@@ -21,6 +21,7 @@ export async function getServerSideProps(
     const boardName = context.params?.boardName as string;
     const threadId = context.params?.threadId as string;
 
+    await ssg.boards.getAll.prefetch();
     await ssg.boards.getByName.prefetch({ boardName });
     await ssg.threads.getById.prefetch({ id: threadId });
 

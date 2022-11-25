@@ -20,7 +20,9 @@ export async function getServerSideProps(
 
     const boardName = context.params?.boardName as string;
 
+    await ssg.boards.getAll.prefetch();
     await ssg.boards.getByName.prefetch({ boardName });
+    await ssg.boards.getCatalogThreads.prefetch({ boardName });
 
     return {
         props: {
