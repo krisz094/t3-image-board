@@ -30,7 +30,12 @@ function ThreadCompose({ boardName }: ThreadComposeProps) {
             });
 
             setTxt('');
-
+            setSub('');
+            setImg('');
+            if (fileRef.current) {
+                fileRef.current.value = '';
+            }
+            
             router.push(`/${boardName}/thread/${th.id}`)
         }
         catch (err) {
@@ -73,8 +78,10 @@ function ThreadCompose({ boardName }: ThreadComposeProps) {
                 <input type="text" placeholder="Subject" value={sub} onChange={e => setSub(e.target.value)} className="outline-none p-1 rounded-sm shadow-md w-full max-w-[400px]" />
                 <textarea placeholder="Thread text" value={txt} onChange={e => setTxt(e.target.value)} className="outline-none p-1 resize-none rounded-sm shadow-md aspect-video w-full max-w-[400px]" />
                 <input ref={fileRef} type="file" onChange={changeFile} accept="image/jpeg,image/png" />
-                <input type="submit" value={"Create thread"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50" />
+
+                <input type="submit" disabled={createThreadMut.isLoading} value={createThreadMut.isLoading ? "Submitting..." : "Create thread"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50" />
             </form>
+            {createThreadMut.error?.message}
         </>
     )
 }

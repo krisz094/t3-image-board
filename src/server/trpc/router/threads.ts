@@ -26,11 +26,13 @@ export const threadsRouter = router({
             },
           },
           subject: input.subject,
-          author: {
-            connect: {
-              id: currUserId,
-            },
-          },
+          author: currUserId
+            ? {
+                connect: {
+                  id: currUserId,
+                },
+              }
+            : undefined,
         },
       });
     }),
@@ -44,7 +46,11 @@ export const threadsRouter = router({
           },
         },
         include: {
-          comments: true,
+          comments: {
+            include: {
+              author: true,
+            },
+          },
           author: true,
         },
       });
@@ -57,7 +63,9 @@ export const threadsRouter = router({
           text: z.string().nullable(),
           image: z.string().min(1).nullable(),
         })
-        .refine((data) => !!data.text || !!data.image)
+        .refine((data) => !!data.text || !!data.image, {
+          message: "Comment needs either text or image",
+        })
     )
     .mutation(async ({ ctx, input }) => {
       const currUserId = ctx.session?.user?.id;

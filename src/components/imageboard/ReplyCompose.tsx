@@ -71,7 +71,7 @@ function ReplyCompose({ threadId }: Props) {
 
                 <textarea placeholder="Reply text" value={txt} onChange={e => setTxt(e.target.value)} className="outline-none p-1 resize-none rounded-sm shadow-md aspect-video w-full max-w-[400px]" />
                 <input ref={fileRef} type="file" onChange={changeFile} accept="image/jpeg,image/png" />
-                <input type="submit" value={"Add reply"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50" />
+                <input disabled={replyMut.isLoading} type="submit" value={replyMut.isLoading ? "Submitting..." : "Add reply"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50 disabled:cursor-wait" />
             </form>
             {replyMut.error?.message}
         </>
