@@ -7,6 +7,8 @@ A simple image board implemented with the T3 stack.
 - [x] Boards
 - [x] Threads
 - [x] Commenting
+- [ ] Log IP and other data of comments for legal reasons
+- [ ] Ability to delete own comment/thread when logged in
 - [x] Catalog
 - [ ] Archive (High prio)
 - [x] Quoting style
