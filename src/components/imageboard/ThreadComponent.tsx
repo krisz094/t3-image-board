@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { memo, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { appendIdToComment } from "../../utils/appendIdToComment";
 import { trpc } from "../../utils/trpc";
 import { BoardsHead } from "./BoardsHead";
@@ -12,6 +12,7 @@ const ThreadComponent = memo(function ThreadComp({ threadId, boardName }: { thre
     const threadQ = trpc.threads.getById.useQuery({ id: threadId });
 
     const [txt, setTxt] = useState('');
+    const fieldRef = useRef<HTMLTextAreaElement>(null);
 
     if (boardQ.isLoading) {
         return <div>Loading...</div>
@@ -31,7 +32,7 @@ const ThreadComponent = memo(function ThreadComp({ threadId, boardName }: { thre
                 <span>{boardQ.data?.description}</span>
             </h1>
 
-            <ReplyCompose threadId={threadId} setTxt={setTxt} txt={txt} />
+            <ReplyCompose threadId={threadId} setTxt={setTxt} txt={txt} txtFieldRef={fieldRef} />
 
             <HorizontalLine />
 
@@ -59,12 +60,12 @@ const ThreadComponent = memo(function ThreadComp({ threadId, boardName }: { thre
 
             <div className="flex flex-col items-start gap-2 ">
 
-                {threadQ.data && <Comment {...threadQ.data} onIdClick={id => appendIdToComment(id, setTxt)} />}
+                {threadQ.data && <Comment {...threadQ.data} onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} />}
 
                 {threadQ.data?.comments.length === 0 && <div className="text-center w-full">No replies yet</div>}
 
                 {threadQ.data?.comments.map(x => (
-                    <Comment {...x} key={x.id} isReply onIdClick={id => appendIdToComment(id, setTxt)} />
+                    <Comment {...x} key={x.id} isReply onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} />
                 ))}
 
             </div>

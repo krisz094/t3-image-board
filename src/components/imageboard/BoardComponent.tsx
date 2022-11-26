@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import Link from "next/link";
-import { memo, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { appendIdToComment } from "../../utils/appendIdToComment";
 import { trpc } from "../../utils/trpc";
 import { BoardsHead } from "./BoardsHead";
@@ -22,6 +22,7 @@ const BoardComponent = memo(function BoardComp({
   const threadsQ = trpc.boards.getPage.useQuery({ boardName, pageNum });
 
   const [txt, setTxt] = useState('');
+  const fieldRef = useRef<HTMLTextAreaElement>(null);
 
   if (boardQ.isLoading) {
     return <div className=" space-y-2 p-2">Loading...</div>;
@@ -39,7 +40,7 @@ const BoardComponent = memo(function BoardComp({
         <span>{boardQ.data?.description}</span>
       </h1>
 
-      <ThreadCompose boardName={boardName} setTxt={setTxt} txt={txt} />
+      <ThreadCompose boardName={boardName} setTxt={setTxt} txt={txt} txtFieldRef={fieldRef} />
 
       <HorizontalLine />
 
@@ -69,12 +70,12 @@ const BoardComponent = memo(function BoardComp({
 
         {threadsQ.data?.map((x) => (
           <div key={x.id} className="flex w-full flex-1 flex-col gap-2">
-            <Comment {...x} boardName={boardName} key={x.id} onIdClick={id => appendIdToComment(id, setTxt)} />
+            <Comment {...x} boardName={boardName} key={x.id} onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} />
             {x.comments
               .slice()
               .reverse()
               .map((y) => (
-                <Comment key={y.id} isReply {...y} onIdClick={id => appendIdToComment(id, setTxt)} />
+                <Comment key={y.id} isReply {...y} onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} />
               ))}
             <HorizontalLine />
           </div>

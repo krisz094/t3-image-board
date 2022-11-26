@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { ChangeEventHandler } from "react";
+import type { ChangeEventHandler, RefObject } from "react";
 import { useCallback, useRef, useState } from "react";
 import { trpc } from "../../utils/trpc";
 
@@ -7,9 +7,10 @@ interface Props {
     threadId: string;
     txt: string;
     setTxt: (txt: string) => void
+    txtFieldRef?: RefObject<HTMLTextAreaElement>;
 }
 
-function ReplyCompose({ threadId, setTxt, txt }: Props) {
+function ReplyCompose({ threadId, setTxt, txt, txtFieldRef }: Props) {
     const tCtx = trpc.useContext();
     const replyMut = trpc.threads.reply.useMutation();
 
@@ -70,7 +71,7 @@ function ReplyCompose({ threadId, setTxt, txt }: Props) {
                     </div>
                 )}
 
-                <textarea placeholder="Reply text" value={txt} onChange={e => setTxt(e.target.value)} className="outline-none p-1 resize-none rounded-sm shadow-md aspect-video w-full max-w-[400px]" />
+                <textarea ref={txtFieldRef} placeholder="Reply text" value={txt} onChange={e => setTxt(e.target.value)} className="outline-none p-1 resize-none rounded-sm shadow-md aspect-video w-full max-w-[400px]" />
                 <input ref={fileRef} type="file" onChange={changeFile} accept="image/jpeg,image/png" />
                 <input disabled={replyMut.isLoading} type="submit" value={replyMut.isLoading ? "Submitting..." : "Add reply"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50 disabled:cursor-wait" />
             </form>
