@@ -6,14 +6,15 @@ import { trpc } from "../../utils/trpc";
 
 interface ThreadComposeProps {
     boardName: string;
+    txt: string;
+    setTxt: (txt: string) => void
 }
 
-function ThreadCompose({ boardName }: ThreadComposeProps) {
+function ThreadCompose({ boardName, setTxt, txt }: ThreadComposeProps) {
     const router = useRouter();
 
     const createThreadMut = trpc.threads.create.useMutation();
 
-    const [txt, setTxt] = useState('');
     const [sub, setSub] = useState('');
     const [img, setImg] = useState('');
 
@@ -35,14 +36,14 @@ function ThreadCompose({ boardName }: ThreadComposeProps) {
             if (fileRef.current) {
                 fileRef.current.value = '';
             }
-            
+
             router.push(`/${boardName}/thread/${th.id}`)
         }
         catch (err) {
             console.log('new thread err');
         }
 
-    }, [boardName, createThreadMut, img, router, sub, txt]);
+    }, [boardName, createThreadMut, img, router, setTxt, sub, txt]);
 
     const changeFile: ChangeEventHandler<HTMLInputElement> = useCallback(e => {
         const file = e.target.files ? e.target.files[0] : null;

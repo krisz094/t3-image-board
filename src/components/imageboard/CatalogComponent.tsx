@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { trpc } from "../../utils/trpc";
 import { BoardsHead } from "./BoardsHead";
 import { HorizontalLine } from "./HorizontalLine";
@@ -13,6 +14,8 @@ function CatalogComponent({ boardName }: CatalogComponentProps) {
   const boardQ = trpc.boards.getByName.useQuery({ boardName });
   const catalogQ = trpc.boards.getCatalogThreads.useQuery({ boardName });
 
+  const [txt, setTxt] = useState('');
+
   return (
     <div className="w-full space-y-2 p-2">
       <BoardsHead isCatalog />
@@ -23,7 +26,7 @@ function CatalogComponent({ boardName }: CatalogComponentProps) {
         <span>{boardQ.data?.description}</span>
       </h1>
 
-      <ThreadCompose boardName={boardName} />
+      <ThreadCompose boardName={boardName} setTxt={setTxt} txt={txt} />
 
       <HorizontalLine />
 
@@ -70,7 +73,9 @@ function CatalogComponent({ boardName }: CatalogComponentProps) {
             </Link>
             <div>
               {x.author ? (
-                <div className="font-bold text-purple-800">{x.author.name}</div>
+                <Link href={`/user/${x.author.id}`}>
+                  <div className="font-bold text-purple-800">{x.author.name}</div>
+                </Link>
               ) : (
                 <div className="font-bold text-green-700">Anonymous</div>
               )}

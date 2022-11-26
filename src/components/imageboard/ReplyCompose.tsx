@@ -5,13 +5,14 @@ import { trpc } from "../../utils/trpc";
 
 interface Props {
     threadId: string;
+    txt: string;
+    setTxt: (txt: string) => void
 }
 
-function ReplyCompose({ threadId }: Props) {
+function ReplyCompose({ threadId, setTxt, txt }: Props) {
     const tCtx = trpc.useContext();
     const replyMut = trpc.threads.reply.useMutation();
 
-    const [txt, setTxt] = useState('');
     const [img, setImg] = useState('');
 
     const fileRef = useRef<HTMLInputElement>(null);
@@ -48,7 +49,7 @@ function ReplyCompose({ threadId }: Props) {
         catch (err) {
             console.log('reply err')
         }
-    }, [img, replyMut, tCtx.threads.getById, threadId, txt]);
+    }, [img, replyMut, tCtx.threads.getById, threadId, txt, setTxt]);
 
     return (
         <>

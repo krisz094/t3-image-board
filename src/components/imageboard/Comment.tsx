@@ -1,7 +1,9 @@
 import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import type { ReactNodeArray } from "react";
+import { useEffect, useMemo, useState } from "react";
+import reactStringReplace from "react-string-replace";
 import { PrettyDateComment as PrettyDateTimeComment } from "../../utils/prettyDate";
 
 export interface ReplyProps {
@@ -13,6 +15,7 @@ export interface ReplyProps {
   boardName?: string;
   isReply?: boolean;
   author?: Author | null;
+  onIdClick?: (id: string) => void;
 }
 
 interface Author {
@@ -29,6 +32,7 @@ export function Comment({
   isReply = false,
   author,
   subject,
+  onIdClick
 }: ReplyProps) {
   const [imgDim, setImgDim] = useState({ w: 200, h: 200 });
   const [imgExt, setImgExt] = useState(false);
@@ -38,9 +42,50 @@ export function Comment({
     setIsMounted(true);
   }, []);
 
+  const formattedText = useMemo(() => {
+    if (!text) {
+      return text;
+    }
+
+    let formatted: string | ReactNodeArray = text;
+
+    /* replace 3+ line breaks with 2 */
+    formatted = reactStringReplace(formatted, /(\n{3,})/g, () => {
+      return '\n\n';
+    });
+
+    /* replace line breaks with br tags */
+    formatted = reactStringReplace(formatted, /(\n)/g, (match, i) => {
+      return <br key={match + i} />
+    });
+
+    /* add links to replies */
+    formatted = reactStringReplace(formatted, /(>>.*\s?)/g, (match, i) => {
+      return (
+        <Link key={match + i} href={`#${match.replace('>>', '')}`}>
+          <span key={match + i} className="text-red-700 hover:underline cursor-pointer">
+            {match}
+          </span>
+        </Link>)
+    });
+
+    /* replace color quotes */
+    formatted = reactStringReplace(formatted, /(>.*)/g, (match, i) => {
+      return <span key={match + i} className="text-green-600">{match}</span>
+    });
+
+    /* add spoilers */
+    formatted = reactStringReplace(formatted, /(\[spoiler\].*\[\/spoiler\])/g, (match, i) => {
+      const txt = match.replace('[spoiler]', '').replace('[/spoiler]', '');
+      return <span key={match + i} className="bg-black text-black hover:text-white transition-all">{txt}</span>
+    });
+
+    return formatted;
+  }, [text]);
+
   return (
-    <div className="flex gap-1">
-      {isReply && <div>{">>"}</div>}
+    <div className="flex gap-1" id={id}>
+      {isReply && <div className="text-xs text-blue-800">{">>"}</div>}
       <div
         className={clsx("flex flex-wrap items-start gap-2 p-2", {
           "rounded-sm bg-blue-300/80 shadow-md": isReply,
@@ -77,7 +122,7 @@ export function Comment({
               <div className="font-bold text-green-700">Anonymous</div>
             )}
             {isMounted && <div>{PrettyDateTimeComment(timestamp)}</div>}
-            <div className="text-red-700">#{id}</div>
+            <div className="text-red-700 cursor-pointer hover:underline" onClick={() => onIdClick && onIdClick(id)}>{id}</div>
             {boardName && (
               <Link href={`/${boardName}/thread/${id}`}>
                 <div className="group">
@@ -90,7 +135,9 @@ export function Comment({
               </Link>
             )}
           </div>
-          <div>{text}</div>
+          <div>
+            {formattedText}
+          </div>
         </div>
       </div>
     </div>
