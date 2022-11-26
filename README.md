@@ -8,23 +8,23 @@ A simple image board implemented with the T3 stack.
 - [x] Threads
 - [x] Commenting
 - [x] Catalog
-- [ ] Archive
+- [ ] Archive (High prio)
 - [x] Quoting style
 - [x] Login with Discord
-- [x] Login with Google, etc
-- [ ] User page (Threads, comments, etc)
+- [ ] Login with Google, etc
+- [ ] User page (Threads, comments, etc) (Low prio)
 - [x] Replying style + link (in thread view)
-- [ ] Replying style + link - Cross thread
-- [ ] Replying style + link - Cross board
+- [ ] Replying style + link - Cross thread (High prio)
+- [ ] Replying style + link - Cross board (Mid prio)
 - [x] Image upload - Base64 in DB
-- [ ] Image upload - To CDN
-- [ ] Captcha
+- [ ] Image upload - To CDN (High prio)
+- [ ] Captcha (Mid prio)
 - [x] Spoiler tags - Single Line
-- [ ] Spoiler tags - Multiline
-- [ ] Code tags - Multiline
-- [ ] Themes
-- [ ] Admin role
-- [ ] Admin/Moderation subsite
+- [ ] Spoiler tags - Multiline (Low prio)
+- [ ] Code tags - Multiline (Low prio)
+- [ ] Themes (Low prio)
+- [ ] Admin role (Mid prio)
+- [ ] Admin/Moderation subsite (Mid prio)
 
 ## Pictures
 
