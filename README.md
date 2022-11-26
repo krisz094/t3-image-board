@@ -23,3 +23,5 @@ A simple image board implemented with the T3 stack.
 - [ ] Spoiler tags - Multiline
 - [ ] Code tags - Multiline
 - [ ] Themes
+- [ ] Admin role
+- [ ] Admin/Moderation subsite
