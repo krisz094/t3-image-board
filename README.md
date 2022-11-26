@@ -25,3 +25,9 @@ A simple image board implemented with the T3 stack.
 - [ ] Themes
 - [ ] Admin role
 - [ ] Admin/Moderation subsite
+
+## Pictures
+
+![image](https://user-images.githubusercontent.com/13174664/204098795-27f867fd-acf0-4df8-8b0f-90fa36b9f5f4.png)
+
+![image](https://user-images.githubusercontent.com/13174664/204098805-5429c9bc-bb6c-4d28-91e1-a4cfe8c4ecd8.png)
