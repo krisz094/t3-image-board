@@ -25,6 +25,74 @@ interface Author {
   name?: string | null;
 }
 
+export function CommentTextToRichText(text: string | undefined | null) {
+  if (!text) {
+    return text;
+  }
+
+  let iFake = 0;
+
+  let formatted: string | ReactNodeArray = text;
+
+  /* replace 3+ line breaks with 2 */
+  formatted = reactStringReplace(formatted, /(\n{3,})/g, () => {
+    return '\n\n';
+  });
+
+  /* replace line breaks with br tags */
+  formatted = reactStringReplace(formatted, /(\n)/g, (match, i) => {
+    return <br key={match + i + (iFake++)} />
+  });
+
+  /* add links to replies */
+  formatted = reactStringReplace(formatted, /(>>.*\s?)/g, (match, i) => {
+    return (
+      <Link key={match + i + (iFake++)} href={`#${match.replace('>>', '')}`}>
+        <span key={match + i + (iFake++)} className="text-red-700 hover:underline cursor-pointer">
+          {match}
+        </span>
+      </Link>)
+  });
+
+  /* replace color quotes */
+  formatted = reactStringReplace(formatted, /(>.*)/g, (match, i) => {
+    return <span key={match + i + (iFake++)} className="text-green-600">{match}</span>
+  });
+
+  /* add spoilers */
+  formatted = reactStringReplace(formatted, /(\[spoiler\].*\[\/spoiler\])/g, (match, i) => {
+    const txt = match.replace('[spoiler]', '').replace('[/spoiler]', '');
+    return <span key={match + i + (iFake++)} className="bg-black text-black hover:text-white transition-all">{txt}</span>
+  });
+
+
+  /* add links */
+  formatted = reactStringReplace(formatted, /((?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$]))/i, (match, i) => {
+
+    const ytMatch = match.match(/(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w-_]+)/i)
+    const spotiMatch = match.match(/(https?:\/\/open.spotify.com\/(track|user|artist|album|playlist)\/[a-zA-Z0-9]+(\/playlist\/[a-zA-Z0-9]+|)|spotify:(track|user|artist|album|playlist):[a-zA-Z0-9]+(:playlist:[a-zA-Z0-9]+|))/);
+
+    if (ytMatch && ytMatch[1]) {
+      const ytId = ytMatch[1];
+      /* console.log(match, i, offset) */
+      return <YouTube key={match + i + (iFake++)} videoId={ytId} loading={"lazy"} />
+    }
+    else if (spotiMatch && spotiMatch[0]) {
+      const link = spotiMatch[0];
+      return <Spotify key={match + i + (iFake++)} link={link} />;
+    }
+    /* else {
+      return match;
+    } */
+    else {
+      /* console.log(match, ytMatch) */
+      return <a className="text-blue-800 hover:underline" key={match + i + (iFake++)} href={match} target={"_blank"} rel="noreferrer">[link]</a>
+    }
+  })
+
+  return formatted;
+}
+
 export function Comment({
   id,
   image,
@@ -44,72 +112,7 @@ export function Comment({
     setIsMounted(true);
   }, []);
 
-  const formattedText = useMemo(() => {
-    if (!text) {
-      return text;
-    }
-
-    let formatted: string | ReactNodeArray = text;
-
-    /* replace 3+ line breaks with 2 */
-    formatted = reactStringReplace(formatted, /(\n{3,})/g, () => {
-      return '\n\n';
-    });
-
-    /* replace line breaks with br tags */
-    formatted = reactStringReplace(formatted, /(\n)/g, (match, i) => {
-      return <br key={match + i} />
-    });
-
-    /* add links to replies */
-    formatted = reactStringReplace(formatted, /(>>.*\s?)/g, (match, i) => {
-      return (
-        <Link key={match + i} href={`#${match.replace('>>', '')}`}>
-          <span key={match + i} className="text-red-700 hover:underline cursor-pointer">
-            {match}
-          </span>
-        </Link>)
-    });
-
-    /* replace color quotes */
-    formatted = reactStringReplace(formatted, /(>.*)/g, (match, i) => {
-      return <span key={match + i} className="text-green-600">{match}</span>
-    });
-
-    /* add spoilers */
-    formatted = reactStringReplace(formatted, /(\[spoiler\].*\[\/spoiler\])/g, (match, i) => {
-      const txt = match.replace('[spoiler]', '').replace('[/spoiler]', '');
-      return <span key={match + i} className="bg-black text-black hover:text-white transition-all">{txt}</span>
-    });
-
-    let iFake = 0;
-
-    /* add links */
-    formatted = reactStringReplace(formatted, /((?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$]))/i, (match, i, offset) => {
-
-      const ytMatch = match.match(/(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w-_]+)/i)
-      const spotiMatch = match.match(/(https?:\/\/open.spotify.com\/(track|user|artist|album|playlist)\/[a-zA-Z0-9]+(\/playlist\/[a-zA-Z0-9]+|)|spotify:(track|user|artist|album|playlist):[a-zA-Z0-9]+(:playlist:[a-zA-Z0-9]+|))/);
-
-      if (ytMatch && ytMatch[1]) {
-        const ytId = ytMatch[1];
-        /* console.log(match, i, offset) */
-        return <YouTube key={match + i + (iFake++)} videoId={ytId} loading={"lazy"} />
-      }
-      else if (spotiMatch && spotiMatch[0]) {
-        const link = spotiMatch[0];
-        return <Spotify key={match + i + (iFake++)} link={link} />;
-      }
-      /* else {
-        return match;
-      } */
-      else {
-        /* console.log(match, ytMatch) */
-        return <a className="text-blue-800 hover:underline" key={match + i + (iFake++)} href={match} target={"_blank"} rel="noreferrer">[link]</a>
-      }
-    })
-
-    return formatted;
-  }, [text]);
+  const formattedText = useMemo(() => CommentTextToRichText(text), [text]);
 
   return (
     <div className="flex gap-1" id={id}>
