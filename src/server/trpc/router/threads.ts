@@ -19,6 +19,7 @@ export const threadsRouter = router({
 
       return ctx.prisma.thread.create({
         data: {
+          deleted: false,
           ip: ip,
           image: input.image,
           text: input.text,
@@ -45,6 +46,7 @@ export const threadsRouter = router({
     .query(({ ctx, input }) => {
       return ctx.prisma.thread.findFirst({
         where: {
+          deleted: false,
           id: {
             equals: input.id,
           },
@@ -53,6 +55,9 @@ export const threadsRouter = router({
           comments: {
             include: {
               author: true,
+            },
+            where: {
+              deleted: false,
             },
           },
           author: true,
@@ -79,6 +84,7 @@ export const threadsRouter = router({
 
       const com = await ctx.prisma.comment.create({
         data: {
+          deleted: false,
           ip: ip,
           text: input.text,
           image: input.image,

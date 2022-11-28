@@ -9,18 +9,35 @@ export const adminRouter = router({
   delThread: adminProcedure
     .input(z.object({ id: z.string() }))
     .mutation(({ ctx, input }) => {
-      return ctx.prisma.thread.delete({
+      /* return ctx.prisma.thread.delete({
         where: {
           id: input.id,
+        },
+      }); */
+      return ctx.prisma.thread.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          deleted: true,
         },
       });
     }),
   delComment: adminProcedure
     .input(z.object({ id: z.string() }))
     .mutation(({ ctx, input }) => {
-      return ctx.prisma.comment.delete({
+      /* return ctx.prisma.comment.delete({
         where: {
           id: input.id,
+        },
+      }); */
+
+      return ctx.prisma.comment.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          deleted: true,
         },
       });
     }),

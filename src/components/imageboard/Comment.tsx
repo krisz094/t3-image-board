@@ -25,6 +25,7 @@ export interface ReplyProps {
 interface Author {
   id?: string | null;
   name?: string | null;
+  image?: string | null;
 }
 
 export function CommentTextToRichText(text: string | undefined | null) {
@@ -148,8 +149,9 @@ export function Comment({
             {subject && (
               <div className="font-bold text-blue-800">{subject}</div>
             )}
+            {author?.image && <Image src={author.image} alt="" width={24} height={24} className="object-contain rounded-full" />}
             {author ? (
-              <div className="font-bold text-purple-800">{author.name}</div>
+              <div className="font-bold text-purple-800 flex gap-0.5 ">{author.name}</div>
             ) : (
               <div className="font-bold text-green-700">Anonymous</div>
             )}

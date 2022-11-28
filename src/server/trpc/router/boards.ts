@@ -14,30 +14,32 @@ export const boardsRouter = router({
     .query(async ({ ctx, input }) => {
       const take = THREAD_PER_PAGE * PAGES_BEFORE_ARCHIVE;
 
-      const asd = await ctx.prisma.thread.findMany({
+      const a = await ctx.prisma.thread.findMany({
         take,
         where: {
+          deleted: false,
           board: {
-            name: {
-              equals: input.boardName,
-            },
+            name: input.boardName,
           },
         },
         include: {
           comments: {
             select: {
               id: true,
-              image: true
-            }
+              image: true,
+            },
+            where: {
+              deleted: false,
+            },
           },
-          author: true
+          author: true,
         },
         orderBy: {
-          updatedAt: 'desc'
+          updatedAt: "desc",
         },
       });
 
-      return asd;
+      return a;
     }),
   getArchiveThreads: publicProcedure
     .input(z.object({ boardName: z.string() }))
@@ -49,6 +51,7 @@ export const boardsRouter = router({
         skip,
         take,
         where: {
+          deleted: false,
           board: {
             name: {
               equals: input.boardName,
@@ -72,6 +75,7 @@ export const boardsRouter = router({
     .query(async ({ ctx, input }) => {
       const cnt = await ctx.prisma.thread.count({
         where: {
+          deleted: false,
           board: {
             name: {
               equals: input.boardName,
@@ -84,11 +88,11 @@ export const boardsRouter = router({
     }),
   getPage: publicProcedure
     .input(z.object({ boardName: z.string(), pageNum: z.number() }))
-    .query(({ ctx, input }) => {
+    .query(async ({ ctx, input }) => {
       const pageIdx = input.pageNum - 1;
       const skip = pageIdx * THREAD_PER_PAGE;
 
-      return ctx.prisma.thread.findMany({
+      const a = await ctx.prisma.thread.findMany({
         orderBy: {
           updatedAt: "desc",
         },
@@ -100,16 +104,26 @@ export const boardsRouter = router({
               equals: input.boardName,
             },
           },
+          deleted: false,
         },
         include: {
+          board: true,
           comments: {
             orderBy: {
               id: "desc",
             },
             take: 3,
+            where: {
+              deleted: false,
+            },
           },
           author: true,
         },
       });
+
+      console.log("ASDASD", a);
+      console.log("INPUT", input.boardName);
+
+      return a;
     }),
 });
