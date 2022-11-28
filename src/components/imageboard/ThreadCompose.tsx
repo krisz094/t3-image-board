@@ -49,7 +49,7 @@ function ThreadCompose({ boardName, setTxt, txt, txtFieldRef }: ThreadComposePro
 
     const changeFile: ChangeEventHandler<HTMLInputElement> = useCallback(e => {
         const file = e.target.files ? e.target.files[0] : null;
-        if (file && ['image/jpeg', 'image/png'].includes(file.type)) {
+        if (file && ['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => setImg(reader.result as string);
@@ -83,7 +83,7 @@ function ThreadCompose({ boardName, setTxt, txt, txtFieldRef }: ThreadComposePro
 
                 <input type="text" placeholder="Subject" value={sub} onChange={e => setSub(e.target.value)} className="outline-none p-1 rounded-sm shadow-md w-full max-w-[400px]" />
                 <textarea ref={txtFieldRef} placeholder="Thread text" value={txt} onChange={e => setTxt(e.target.value)} className="outline-none p-1 resize-none rounded-sm shadow-md aspect-video w-full max-w-[400px]" />
-                <input ref={fileRef} type="file" onChange={changeFile} accept="image/jpeg,image/png" />
+                <input ref={fileRef} type="file" onChange={changeFile} accept="image/jpeg,image/png,image/webp" />
 
                 <input type="submit" disabled={createThreadMut.isLoading} value={createThreadMut.isLoading ? "Submitting..." : "Create thread"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50" />
             </form>

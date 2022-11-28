@@ -21,7 +21,7 @@ function ReplyCompose({ threadId, setTxt, txt, txtFieldRef }: Props) {
 
     const changeFile: ChangeEventHandler<HTMLInputElement> = useCallback(e => {
         const file = e.target.files ? e.target.files[0] : null;
-        if (file && ['image/jpeg', 'image/png'].includes(file.type)) {
+        if (file && ['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => setImg(reader.result as string);
@@ -76,7 +76,7 @@ function ReplyCompose({ threadId, setTxt, txt, txtFieldRef }: Props) {
                 )}
 
                 <textarea ref={txtFieldRef} placeholder="Reply text" value={txt} onChange={e => setTxt(e.target.value)} className="outline-none p-1 resize-none rounded-sm shadow-md aspect-video w-full max-w-[400px]" />
-                <input ref={fileRef} type="file" onChange={changeFile} accept="image/jpeg,image/png" />
+                <input ref={fileRef} type="file" onChange={changeFile} accept="image/jpeg,image/png,image/webp" />
                 <input disabled={replyMut.isLoading} type="submit" value={replyMut.isLoading ? "Submitting..." : "Add reply"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50 disabled:cursor-wait" />
             </form>
             {replyMut.error?.message && <div className="font-bold text-center text-lg text-red-600">{prettyError(replyMut.error?.message)}</div>}
