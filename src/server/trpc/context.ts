@@ -7,6 +7,7 @@ import { prisma } from "../db/client";
 
 type CreateContextOptions = {
   session: Session | null;
+  ip?: string;
 };
 
 /** Use this helper for:
@@ -17,6 +18,7 @@ type CreateContextOptions = {
 export const createContextInner = async (opts: CreateContextOptions) => {
   return {
     session: opts.session,
+    ip: opts.ip,
     prisma,
   };
 };
@@ -28,13 +30,14 @@ export const createContextInner = async (opts: CreateContextOptions) => {
 export const createContext = async (opts: CreateNextContextOptions) => {
   const { req, res } = opts;
 
-  console.log('IP', req.socket.remoteAddress)
+  console.log("IP", req.socket.remoteAddress);
 
   // Get the session from the server using the unstable_getServerSession wrapper function
   const session = await getServerAuthSession({ req, res });
 
   return await createContextInner({
     session,
+    ip: req.socket.remoteAddress,
   });
 };
 

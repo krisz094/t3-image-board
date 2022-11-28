@@ -76,21 +76,13 @@ export function CommentTextToRichText(text: string | undefined | null) {
 
     if (ytMatch && ytMatch[1]) {
       const ytId = ytMatch[1];
-      /* console.log(match, i, offset) */
-
-      return <YouTube key={match + i + (iFake++)} videoId={ytId} className={styles.ytvid} />
-
-
+      return <YouTube key={match + i + (iFake++)} videoId={ytId} className={styles.ytvid} />;
     }
     else if (spotiMatch && spotiMatch[0]) {
       const link = spotiMatch[0];
       return <Spotify key={match + i + (iFake++)} link={link} />;
     }
-    /* else {
-      return match;
-    } */
     else {
-      /* console.log(match, ytMatch) */
       return <a className="text-blue-800 hover:underline" key={match + i + (iFake++)} href={match} target={"_blank"} rel="noreferrer">[link]</a>
     }
   })
@@ -124,9 +116,10 @@ export function Comment({
     <div className="flex gap-1" id={id}>
       {isReply && <div className="text-xs text-blue-800 hidden sm:block">{">>"}</div>}
       <div
-        className={clsx("flex flex-wrap items-start gap-2 p-2 flex-col sm:flex-row flex-1 sm:flex-initial", {
+        className={clsx("flex flex-wrap items-start gap-2 p-2 flex-1 sm:flex-initial", {
           "rounded-sm bg-blue-300/80 shadow-md": isReply,
           "flex-col": imgExt,
+          "flex-col sm:flex-row": !imgExt
         })}
       >
         {image && (

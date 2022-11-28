@@ -60,7 +60,7 @@ model User {
 }
 
 model VerificationToken {
-  identifier String @id @map("_id")
+  identifier String   @id @map("_id")
   token      String   @unique
   expires    DateTime
 
@@ -86,6 +86,7 @@ model Thread {
   comments  Comment[]
   updatedAt DateTime?
   userId    String?
+  ip        String?
 }
 
 model Comment {
@@ -97,4 +98,5 @@ model Comment {
   thread    Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
   threadId  String
   userId    String?
+  ip        String?
 }

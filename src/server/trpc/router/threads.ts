@@ -13,9 +13,13 @@ export const threadsRouter = router({
     )
     .mutation(({ ctx, input }) => {
       const currUserId = ctx.session?.user?.id;
+      const ip = ctx.ip;
+
+      console.log("IP ADDR", ip);
 
       return ctx.prisma.thread.create({
         data: {
+          ip: ip,
           image: input.image,
           text: input.text,
           timestamp: new Date(),
@@ -69,9 +73,13 @@ export const threadsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const currUserId = ctx.session?.user?.id;
+      const ip = ctx.ip;
+
+      console.log("IP ADDR", ip);
 
       const com = await ctx.prisma.comment.create({
         data: {
+          ip: ip,
           text: input.text,
           image: input.image,
           timestamp: new Date(),
