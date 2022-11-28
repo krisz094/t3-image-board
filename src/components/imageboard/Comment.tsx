@@ -3,7 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNodeArray } from "react";
 import { useEffect, useMemo, useState } from "react";
+import Spotify from 'react-spotify-embed';
 import reactStringReplace from "react-string-replace";
+import YouTube from "react-youtube";
 import { PrettyDateComment as PrettyDateTimeComment } from "../../utils/prettyDate";
 
 export interface ReplyProps {
@@ -80,6 +82,29 @@ export function Comment({
       return <span key={match + i} className="bg-black text-black hover:text-white transition-all">{txt}</span>
     });
 
+    /* add links */
+    formatted = reactStringReplace(formatted, /((?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$]))/i, (match, i) => {
+
+      const ytMatch = match.match(/(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w-_]+)/i)
+      const spotiMatch = match.match(/(https?:\/\/open.spotify.com\/(track|user|artist|album|playlist)\/[a-zA-Z0-9]+(\/playlist\/[a-zA-Z0-9]+|)|spotify:(track|user|artist|album|playlist):[a-zA-Z0-9]+(:playlist:[a-zA-Z0-9]+|))/);
+
+      if (ytMatch && ytMatch[1]) {
+        const ytId = ytMatch[1];
+        return <YouTube key={match + i} videoId={ytId} loading={"lazy"} />
+      }
+      else if (spotiMatch && spotiMatch[0]) {
+        const link = spotiMatch[0];
+        return <Spotify key={match + i} link={link} />;
+      }
+      else {
+        return match;
+      }
+      /* else {
+        console.log(match, ytMatch)
+        return <a className="text-blue-800 hover:underline" key={match + i} href={match} target={"_blank"} rel="noreferrer">[link]</a>
+      } */
+    })
+
     return formatted;
   }, [text]);
 
@@ -93,23 +118,25 @@ export function Comment({
         })}
       >
         {image && (
-          <Image
-            src={image}
-            alt="Post image"
-            width={imgExt ? imgDim.w : Math.min(200, imgDim.w)}
-            height={imgExt ? imgDim.h : Math.min(200, imgDim.h)}
-            className="cursor-pointer object-contain"
-            onClick={(e) => {
-              if (e.button == 0) {
-                e.preventDefault();
-                setImgExt((v) => !v);
-              }
-            }}
-            onLoad={(e) => {
-              const tar = e.target as HTMLImageElement;
-              setImgDim({ w: tar.naturalWidth, h: tar.naturalHeight });
-            }}
-          />
+          <div>
+            <Image
+              src={image}
+              alt="Post image"
+              width={imgExt ? imgDim.w : Math.min(200, imgDim.w)}
+              height={imgExt ? imgDim.h : Math.min(200, imgDim.h)}
+              className="cursor-pointer object-contain "
+              onClick={(e) => {
+                if (e.button == 0) {
+                  e.preventDefault();
+                  setImgExt((v) => !v);
+                }
+              }}
+              onLoad={(e) => {
+                const tar = e.target as HTMLImageElement;
+                setImgDim({ w: tar.naturalWidth, h: tar.naturalHeight });
+              }}
+            />
+          </div>
         )}
         <div className="flex flex-1 flex-col gap-2">
           <div className="flex flex-wrap gap-1.5 text-sm">
@@ -122,7 +149,7 @@ export function Comment({
               <div className="font-bold text-green-700">Anonymous</div>
             )}
             {isMounted && <div>{PrettyDateTimeComment(timestamp)}</div>}
-            <div className="text-red-700 cursor-pointer hover:underline" onClick={() => onIdClick && onIdClick(id)}>{id}</div>
+            <div className="text-blue-800 cursor-pointer hover:underline" onClick={() => onIdClick && onIdClick(id)}>No. {id}</div>
             {boardName && (
               <Link href={`/${boardName}/thread/${id}`}>
                 <div className="group">
