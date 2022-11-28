@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { ChangeEventHandler, RefObject } from "react";
 import { useCallback, useRef, useState } from "react";
+import { prettyError } from "../../utils/prettyError";
 import { trpc } from "../../utils/trpc";
 
 interface Props {
@@ -28,6 +29,9 @@ function ReplyCompose({ threadId, setTxt, txt, txtFieldRef }: Props) {
         }
         else {
             setImg('');
+            if (fileRef.current) {
+                fileRef.current.value = '';
+            }
         }
     }, []);
 
@@ -75,7 +79,7 @@ function ReplyCompose({ threadId, setTxt, txt, txtFieldRef }: Props) {
                 <input ref={fileRef} type="file" onChange={changeFile} accept="image/jpeg,image/png" />
                 <input disabled={replyMut.isLoading} type="submit" value={replyMut.isLoading ? "Submitting..." : "Add reply"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50 disabled:cursor-wait" />
             </form>
-            {replyMut.error?.message}
+            {replyMut.error?.message && <div className="font-bold text-center text-lg text-red-600">{prettyError(replyMut.error?.message)}</div>}
         </>
     )
 }

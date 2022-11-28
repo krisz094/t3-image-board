@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import type { ChangeEventHandler, RefObject } from "react";
 import { useCallback, useRef, useState } from "react";
+import { prettyError } from "../../utils/prettyError";
 import { trpc } from "../../utils/trpc";
 
 interface ThreadComposeProps {
@@ -56,6 +57,9 @@ function ThreadCompose({ boardName, setTxt, txt, txtFieldRef }: ThreadComposePro
         }
         else {
             setImg('');
+            if (fileRef.current) {
+                fileRef.current.value = '';
+            }
         }
     }, []);
     return (
@@ -83,7 +87,8 @@ function ThreadCompose({ boardName, setTxt, txt, txtFieldRef }: ThreadComposePro
 
                 <input type="submit" disabled={createThreadMut.isLoading} value={createThreadMut.isLoading ? "Submitting..." : "Create thread"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50" />
             </form>
-            {createThreadMut.error?.message}
+
+            {createThreadMut.error?.message && <div className="font-bold text-center text-lg text-red-600">{prettyError(createThreadMut.error?.message)}</div>}
         </>
     )
 }

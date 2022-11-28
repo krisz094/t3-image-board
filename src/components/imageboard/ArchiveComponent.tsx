@@ -10,7 +10,7 @@ interface ArchiveComponentProps {
 
 function ArchiveComponent({ boardName }: ArchiveComponentProps) {
     const boardQ = trpc.boards.getByName.useQuery({ boardName });
-    const archiveQ = trpc.boards.getArchiveThreads.useQuery({ boardName });
+    /* const archiveQ = trpc.boards.getArchiveThreads.useQuery({ boardName }); */
 
     const [txt, setTxt] = useState('');
 
@@ -25,9 +25,7 @@ function ArchiveComponent({ boardName }: ArchiveComponentProps) {
             </h1>
 
             <ThreadCompose boardName={boardName} setTxt={setTxt} txt={txt} />
-
             <HorizontalLine />
-
         </div>
     )
 }
