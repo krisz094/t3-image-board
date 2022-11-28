@@ -82,27 +82,30 @@ export function Comment({
       return <span key={match + i} className="bg-black text-black hover:text-white transition-all">{txt}</span>
     });
 
+    let iFake = 0;
+
     /* add links */
-    formatted = reactStringReplace(formatted, /((?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$]))/i, (match, i) => {
+    formatted = reactStringReplace(formatted, /((?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$]))/i, (match, i, offset) => {
 
       const ytMatch = match.match(/(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w-_]+)/i)
       const spotiMatch = match.match(/(https?:\/\/open.spotify.com\/(track|user|artist|album|playlist)\/[a-zA-Z0-9]+(\/playlist\/[a-zA-Z0-9]+|)|spotify:(track|user|artist|album|playlist):[a-zA-Z0-9]+(:playlist:[a-zA-Z0-9]+|))/);
 
       if (ytMatch && ytMatch[1]) {
         const ytId = ytMatch[1];
-        return <YouTube key={match + i} videoId={ytId} loading={"lazy"} />
+        /* console.log(match, i, offset) */
+        return <YouTube key={match + i + (iFake++)} videoId={ytId} loading={"lazy"} />
       }
       else if (spotiMatch && spotiMatch[0]) {
         const link = spotiMatch[0];
-        return <Spotify key={match + i} link={link} />;
-      }
-      else {
-        return match;
+        return <Spotify key={match + i + (iFake++)} link={link} />;
       }
       /* else {
-        console.log(match, ytMatch)
-        return <a className="text-blue-800 hover:underline" key={match + i} href={match} target={"_blank"} rel="noreferrer">[link]</a>
+        return match;
       } */
+      else {
+        /* console.log(match, ytMatch) */
+        return <a className="text-blue-800 hover:underline" key={match + i + (iFake++)} href={match} target={"_blank"} rel="noreferrer">[link]</a>
+      }
     })
 
     return formatted;
