@@ -15,7 +15,7 @@ export const threadsRouter = router({
       const currUserId = ctx.session?.user?.id;
       const ip = ctx.ip;
 
-      console.log("IP ADDR", ip);
+      /* console.log("IP ADDR", ip); */
 
       return ctx.prisma.thread.create({
         data: {
@@ -75,7 +75,7 @@ export const threadsRouter = router({
       const currUserId = ctx.session?.user?.id;
       const ip = ctx.ip;
 
-      console.log("IP ADDR", ip);
+      /* console.log("IP ADDR", ip); */
 
       const com = await ctx.prisma.comment.create({
         data: {
