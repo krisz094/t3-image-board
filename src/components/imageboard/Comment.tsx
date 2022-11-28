@@ -7,6 +7,7 @@ import Spotify from 'react-spotify-embed';
 import reactStringReplace from "react-string-replace";
 import YouTube from "react-youtube";
 import { PrettyDateComment as PrettyDateTimeComment } from "../../utils/prettyDate";
+import styles from './Comment.module.css';
 
 export interface ReplyProps {
   id: string;
@@ -18,6 +19,7 @@ export interface ReplyProps {
   isReply?: boolean;
   author?: Author | null;
   onIdClick?: (id: string) => void;
+  onDelClick?: (id: string) => void;
 }
 
 interface Author {
@@ -75,7 +77,10 @@ export function CommentTextToRichText(text: string | undefined | null) {
     if (ytMatch && ytMatch[1]) {
       const ytId = ytMatch[1];
       /* console.log(match, i, offset) */
-      return <YouTube key={match + i + (iFake++)} videoId={ytId} loading={"lazy"} />
+
+      return <YouTube key={match + i + (iFake++)} videoId={ytId} className={styles.ytvid} />
+
+
     }
     else if (spotiMatch && spotiMatch[0]) {
       const link = spotiMatch[0];
@@ -102,7 +107,8 @@ export function Comment({
   isReply = false,
   author,
   subject,
-  onIdClick
+  onIdClick,
+  onDelClick
 }: ReplyProps) {
   const [imgDim, setImgDim] = useState({ w: 200, h: 200 });
   const [imgExt, setImgExt] = useState(false);
@@ -116,9 +122,9 @@ export function Comment({
 
   return (
     <div className="flex gap-1" id={id}>
-      {isReply && <div className="text-xs text-blue-800">{">>"}</div>}
+      {isReply && <div className="text-xs text-blue-800 hidden sm:block">{">>"}</div>}
       <div
-        className={clsx("flex flex-wrap items-start gap-2 p-2", {
+        className={clsx("flex flex-wrap items-start gap-2 p-2 flex-col sm:flex-row flex-1 sm:flex-initial", {
           "rounded-sm bg-blue-300/80 shadow-md": isReply,
           "flex-col": imgExt,
         })}
@@ -167,6 +173,7 @@ export function Comment({
                 </div>
               </Link>
             )}
+            {onDelClick && <div className="font-bold text-red-500 cursor-pointer hover:scale-110" onClick={() => onDelClick(id)}>X</div>}
           </div>
           <div>
             {formattedText}

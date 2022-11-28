@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { memo, useRef, useState } from "react";
+import { useRouter } from "next/router";
+import { memo, useMemo, useRef, useState } from "react";
 import { appendIdToComment } from "../../utils/appendIdToComment";
 import { trpc } from "../../utils/trpc";
 import { BoardsHead } from "./BoardsHead";
@@ -8,8 +9,36 @@ import { HorizontalLine } from "./HorizontalLine";
 import ReplyCompose from "./ReplyCompose";
 
 const ThreadComponent = memo(function ThreadComp({ threadId, boardName }: { threadId: string, boardName: string }) {
+    const router = useRouter();
+
+    const trpcC = trpc.useContext();
     const boardQ = trpc.boards.getByName.useQuery({ boardName });
     const threadQ = trpc.threads.getById.useQuery({ id: threadId });
+    const isAdminQ = trpc.admin.isCurrUserAdmin.useQuery();
+    const isAdmin = useMemo(() => !!isAdminQ.data, [isAdminQ.data]);
+
+    /* Mutations */
+    const delThreadMut = trpc.admin.delThread.useMutation({
+        onSuccess: async () => {
+            router.replace(`/${boardName}`);
+        }
+    });
+    const delCommentMut = trpc.admin.delComment.useMutation({
+        onMutate: async ({ id: commentId }) => {
+            const dat = trpcC.threads.getById.getData({ id: threadId });
+            if (dat) {
+                trpcC.threads.getById.setData({ id: threadId }, () => {
+                    return {
+                        ...dat,
+                        comments: dat.comments.filter(x => x.id != commentId)
+                    }
+                });
+            }
+        },
+        onSuccess: async () => {
+            threadQ.refetch();
+        }
+    });
 
     const [txt, setTxt] = useState('');
     const fieldRef = useRef<HTMLTextAreaElement>(null);
@@ -60,12 +89,12 @@ const ThreadComponent = memo(function ThreadComp({ threadId, boardName }: { thre
 
             <div className="flex flex-col items-start gap-2 ">
 
-                {threadQ.data && <Comment {...threadQ.data} onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} />}
+                {threadQ.data && <Comment {...threadQ.data} onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} onDelClick={isAdmin ? id => delThreadMut.mutate({ id }) : undefined} />}
 
                 {threadQ.data?.comments.length === 0 && <div className="text-center w-full">No replies yet</div>}
 
                 {threadQ.data?.comments.map(x => (
-                    <Comment {...x} key={x.id} isReply onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} />
+                    <Comment {...x} key={x.id} isReply onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} onDelClick={isAdmin ? id => delCommentMut.mutate({ id }) : undefined} />
                 ))}
 
             </div>

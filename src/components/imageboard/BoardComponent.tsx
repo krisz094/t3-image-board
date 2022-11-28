@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import Link from "next/link";
-import { memo, useRef, useState } from "react";
+import { memo, useMemo, useRef, useState } from "react";
 import { appendIdToComment } from "../../utils/appendIdToComment";
 import { trpc } from "../../utils/trpc";
 import { BoardsHead } from "./BoardsHead";
@@ -17,9 +17,24 @@ const BoardComponent = memo(function BoardComp({
   pageNum,
   boardName,
 }: BoardComponentProps) {
+  /* Queries */
   const boardQ = trpc.boards.getByName.useQuery({ boardName });
   const pageNumQ = trpc.boards.getPageNum.useQuery({ boardName });
   const threadsQ = trpc.boards.getPage.useQuery({ boardName, pageNum });
+  const isAdminQ = trpc.admin.isCurrUserAdmin.useQuery();
+  const isAdmin = useMemo(() => !!isAdminQ.data, [isAdminQ.data]);
+
+  /* Mutations */
+  const delThreadMut = trpc.admin.delThread.useMutation({
+    onSuccess: async () => {
+      threadsQ.refetch();
+    }
+  });
+  const delCommentMut = trpc.admin.delComment.useMutation({
+    onSuccess: async () => {
+      threadsQ.refetch();
+    }
+  });
 
   const [txt, setTxt] = useState('');
   const fieldRef = useRef<HTMLTextAreaElement>(null);
@@ -70,12 +85,12 @@ const BoardComponent = memo(function BoardComp({
 
         {threadsQ.data?.map((x) => (
           <div key={x.id} className="flex w-full flex-1 flex-col gap-2">
-            <Comment {...x} boardName={boardName} key={x.id} onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} />
+            <Comment {...x} boardName={boardName} key={x.id} onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} onDelClick={isAdmin ? id => delThreadMut.mutate({ id }) : undefined} />
             {x.comments
               .slice()
               .reverse()
               .map((y) => (
-                <Comment key={y.id} isReply {...y} onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} />
+                <Comment key={y.id} isReply {...y} onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} onDelClick={isAdmin ? id => delCommentMut.mutate({ id }) : undefined} />
               ))}
             <HorizontalLine />
           </div>
