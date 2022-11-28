@@ -33,10 +33,10 @@ export const threadsRouter = router({
           subject: input.subject,
           author: currUserId
             ? {
-                connect: {
-                  id: currUserId,
-                },
-              }
+              connect: {
+                id: currUserId,
+              },
+            }
             : undefined,
         },
       });
@@ -80,29 +80,29 @@ export const threadsRouter = router({
       const currUserId = ctx.session?.user?.id;
       const ip = ctx.ip;
 
-      /* console.log("IP ADDR", ip); */
+      const [comment] = await ctx.prisma.$transaction([
+        ctx.prisma.comment.create({
+          data: {
+            deleted: false,
+            ip: ip,
+            text: input.text,
+            image: input.image,
+            timestamp: new Date(),
+            threadId: input.threadId,
+            userId: currUserId,
+          },
+        }),
+        ctx.prisma.thread.update({
+          where: {
+            id: input.threadId,
+          },
+          data: {
+            updatedAt: new Date(),
+          },
+        })
+      ]);
 
-      const com = await ctx.prisma.comment.create({
-        data: {
-          deleted: false,
-          ip: ip,
-          text: input.text,
-          image: input.image,
-          timestamp: new Date(),
-          threadId: input.threadId,
-          userId: currUserId,
-        },
-      });
+      return comment;
 
-      await ctx.prisma.thread.update({
-        where: {
-          id: input.threadId,
-        },
-        data: {
-          updatedAt: new Date(),
-        },
-      });
-
-      return com;
     }),
 });
