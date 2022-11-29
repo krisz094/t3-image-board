@@ -163,9 +163,6 @@ export const boardsRouter = router({
         },
       });
 
-      console.log("ASDASD", a);
-      console.log("INPUT", input.boardName);
-
       return a;
     }),
 });
