@@ -38,7 +38,7 @@ function CatalogThread(props: CatalogThreadProps) {
     <div key={props.id} className="flex flex-col items-center leading-tight">
       <Link href={`/${props.boardName}/thread/${props.id}`}>
         <div className="cursor-pointer object-contain shadow-md transition-all hover:scale-105">
-          <AdvancedImage cldImg={cldImg} plugins={[placeholder({ mode: 'blur' })]} />
+          <AdvancedImage cldImg={cldImg} plugins={[placeholder(/* { mode: 'blur' } */)]} />
         </div>
       </Link>
       <div>

@@ -149,7 +149,7 @@ export function Comment({
               }
             }}
           >
-            <AdvancedImage cldImg={cldImg} plugins={[placeholder({ mode: 'blur' })]} />
+            <AdvancedImage cldImg={cldImg} plugins={[placeholder(/* { mode: 'blur' } */)]} />
           </div>
         )}
         <div className="flex flex-1 flex-col gap-2">
