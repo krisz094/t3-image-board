@@ -13,6 +13,8 @@
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
+    "@cloudinary/react": "^1.6.0",
+    "@cloudinary/url-gen": "^1.8.6",
     "@fontsource/open-sans": "^4.5.13",
     "@next-auth/prisma-adapter": "^1.0.4",
     "@prisma/client": "^4.5.0",

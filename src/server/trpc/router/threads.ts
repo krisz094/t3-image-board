@@ -15,8 +15,6 @@ export const threadsRouter = router({
       const currUserId = ctx.session?.user?.id;
       const ip = ctx.ip;
 
-      /* console.log("IP ADDR", ip); */
-
       return ctx.prisma.thread.create({
         data: {
           deleted: false,
@@ -33,10 +31,10 @@ export const threadsRouter = router({
           subject: input.subject,
           author: currUserId
             ? {
-              connect: {
-                id: currUserId,
-              },
-            }
+                connect: {
+                  id: currUserId,
+                },
+              }
             : undefined,
         },
       });
@@ -51,16 +49,34 @@ export const threadsRouter = router({
             equals: input.id,
           },
         },
-        include: {
+        select: {
           comments: {
-            include: {
-              author: true,
+            select: {
+              id: true,
+              image: true,
+              text: true,
+              timestamp: true,
+              author: {
+                select: { name: true, image: true, id: true },
+              },
             },
             where: {
               deleted: false,
             },
           },
-          author: true,
+          author: {
+            select: {
+              name: true,
+              image: true,
+              id: true,
+            },
+          },
+          id: true,
+          image: true,
+          subject: true,
+          timestamp: true,
+          updatedAt: true,
+          text: true,
         },
       });
     }),
@@ -99,10 +115,9 @@ export const threadsRouter = router({
           data: {
             updatedAt: new Date(),
           },
-        })
+        }),
       ]);
 
       return comment;
-
     }),
 });

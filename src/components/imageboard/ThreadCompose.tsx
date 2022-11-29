@@ -1,7 +1,7 @@
-import Image from "next/image";
 import { useRouter } from "next/router";
-import type { ChangeEventHandler, RefObject } from "react";
+import type { RefObject } from "react";
 import { useCallback, useRef, useState } from "react";
+import { postImage } from "../../utils/postImage";
 import { prettyError } from "../../utils/prettyError";
 import { trpc } from "../../utils/trpc";
 
@@ -18,23 +18,31 @@ function ThreadCompose({ boardName, setTxt, txt, txtFieldRef }: ThreadComposePro
     const createThreadMut = trpc.threads.create.useMutation();
 
     const [sub, setSub] = useState('');
-    const [img, setImg] = useState('');
+    const [img, setImg] = useState<File | null>(null);
+    const [ul, setUl] = useState(false);
 
     const fileRef = useRef<HTMLInputElement>(null);
 
     const submit = useCallback(async () => {
+        if (!img) {
+            return;
+        }
+
         try {
+            setUl(true);
+            const imgResp = await postImage(img);
+            setUl(false);
 
             const th = await createThreadMut.mutateAsync({
                 boardName,
                 text: txt,
-                image: img.trim(),
+                image: imgResp.public_id,
                 subject: sub.trim() || null
             });
 
             setTxt('');
+            setImg(null);
             setSub('');
-            setImg('');
             if (fileRef.current) {
                 fileRef.current.value = '';
             }
@@ -42,48 +50,25 @@ function ThreadCompose({ boardName, setTxt, txt, txtFieldRef }: ThreadComposePro
             router.push(`/${boardName}/thread/${th.id}`)
         }
         catch (err) {
+            setUl(false);
             console.log('new thread err');
         }
 
     }, [boardName, createThreadMut, img, router, setTxt, sub, txt]);
 
-    const changeFile: ChangeEventHandler<HTMLInputElement> = useCallback(e => {
-        const file = e.target.files ? e.target.files[0] : null;
-        if (file && ['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => setImg(reader.result as string);
-            reader.onerror = () => setImg('');
-        }
-        else {
-            setImg('');
-            if (fileRef.current) {
-                fileRef.current.value = '';
-            }
-        }
-    }, []);
     return (
         <>
             <form onSubmit={e => { e.preventDefault(); submit(); }} className="flex flex-col gap-1.5 items-center px-2">
-                {img && (
-                    <div className="w-[200px] h-[200px] rounded-md overflow-hidden relative">
-                        <Image src={img} layout="fill" className="object-contain" alt="Uploaded image" />
-                        <div
-                            className="text-xs bg-black/50 absolute bottom-1 right-1 text-white rounded-md px-2 py-1 cursor-pointer"
-                            onClick={() => {
-                                setImg('');
-                                if (fileRef.current) {
-                                    fileRef.current.value = '';
-                                }
-                            }}>
-                            Clear
-                        </div>
-                    </div>
-                )}
-
                 <input type="text" placeholder="Subject" value={sub} onChange={e => setSub(e.target.value)} className="outline-none p-1 rounded-sm shadow-md w-full max-w-[400px]" />
                 <textarea ref={txtFieldRef} placeholder="Thread text" value={txt} onChange={e => setTxt(e.target.value)} className="outline-none p-1 resize-none rounded-sm shadow-md aspect-video w-full max-w-[400px]" />
-                <input ref={fileRef} type="file" onChange={changeFile} accept="image/jpeg,image/png,image/webp" />
+                <input
+                    type="file"
+                    onChange={e => {
+                        const f = e.target.files?.length ? e.target.files[0] || null : null;
+                        setImg(f);
+                    }}
+                    accept="image/jpeg,image/png,image/webp"
+                />
 
                 <input type="submit" disabled={createThreadMut.isLoading} value={createThreadMut.isLoading ? "Submitting..." : "Create thread"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50" />
             </form>

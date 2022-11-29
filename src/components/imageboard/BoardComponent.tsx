@@ -86,6 +86,9 @@ const BoardComponent = memo(function BoardComp({
         {threadsQ.data?.map((x) => (
           <div key={x.id} className="flex w-full flex-1 flex-col gap-2">
             <Comment {...x} boardName={boardName} key={x.id} onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} onDelClick={isAdmin ? id => delThreadMut.mutate({ id }) : undefined} />
+
+            {x._count.comments > 3 && <div className="sm:pl-4">3 out of {x._count.comments} replies shown. <Link href={`/${boardName}/thread/${x.id}`}><span className="underline">View thread</span></Link></div>}
+
             {x.comments
               .slice()
               .reverse()

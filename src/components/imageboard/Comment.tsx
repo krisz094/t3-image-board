@@ -1,3 +1,5 @@
+import { AdvancedImage, placeholder } from '@cloudinary/react';
+import { Resize } from '@cloudinary/url-gen/actions/resize';
 import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
@@ -6,9 +8,9 @@ import { useEffect, useMemo, useState } from "react";
 import Spotify from 'react-spotify-embed';
 import reactStringReplace from "react-string-replace";
 import YouTube from "react-youtube";
+import { myCld } from "../../utils/cloudinary";
 import { PrettyDateComment as PrettyDateTimeComment } from "../../utils/prettyDate";
 import styles from './Comment.module.css';
-
 export interface ReplyProps {
   id: string;
   timestamp: Date;
@@ -103,7 +105,7 @@ export function Comment({
   onIdClick,
   onDelClick
 }: ReplyProps) {
-  const [imgDim, setImgDim] = useState({ w: 200, h: 200 });
+  /* const [imgDim, setImgDim] = useState({ w: 200, h: 200 }); */
   const [imgExt, setImgExt] = useState(false);
 
   const [isMounted, setIsMounted] = useState(false);
@@ -112,6 +114,21 @@ export function Comment({
   }, []);
 
   const formattedText = useMemo(() => CommentTextToRichText(text), [text]);
+
+  const cldImg = useMemo(() => {
+    if (!image) {
+      return undefined;
+    }
+    else {
+      const img = myCld.image(image);
+
+      if (!imgExt) {
+        img.resize(Resize.fit(200, 200));
+      }
+
+      return img;
+    }
+  }, [image, imgExt]);
 
   return (
     <div className="flex gap-1" id={id}>
@@ -123,25 +140,16 @@ export function Comment({
           "flex-col sm:flex-row": !imgExt
         })}
       >
-        {image && (
-          <div>
-            <Image
-              src={image}
-              alt="Post image"
-              width={imgExt ? imgDim.w : Math.min(200, imgDim.w)}
-              height={imgExt ? imgDim.h : Math.min(200, imgDim.h)}
-              className="cursor-pointer object-contain "
-              onClick={(e) => {
-                if (e.button == 0) {
-                  e.preventDefault();
-                  setImgExt((v) => !v);
-                }
-              }}
-              onLoad={(e) => {
-                const tar = e.target as HTMLImageElement;
-                setImgDim({ w: tar.naturalWidth, h: tar.naturalHeight });
-              }}
-            />
+        {cldImg && (
+          <div
+            className='cursor-pointer'
+            onClick={(e) => {
+              if (e.button == 0) {
+                setImgExt((v) => !v);
+              }
+            }}
+          >
+            <AdvancedImage cldImg={cldImg} plugins={[placeholder({ mode: 'blur' })]} />
           </div>
         )}
         <div className="flex flex-1 flex-col gap-2">

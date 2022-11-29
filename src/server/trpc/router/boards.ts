@@ -22,7 +22,7 @@ export const boardsRouter = router({
             name: input.boardName,
           },
         },
-        include: {
+        select: {
           comments: {
             select: {
               id: true,
@@ -33,6 +33,12 @@ export const boardsRouter = router({
             },
           },
           author: true,
+          id: true,
+          image: true,
+          subject: true,
+          text: true,
+          timestamp: true,
+          updatedAt: true,
         },
         orderBy: {
           updatedAt: "desc",
@@ -58,8 +64,23 @@ export const boardsRouter = router({
             },
           },
         },
-        include: {
+        select: {
+          comments: {
+            select: {
+              id: true,
+              image: true,
+            },
+            where: {
+              deleted: false,
+            },
+          },
           author: true,
+          id: true,
+          image: true,
+          subject: true,
+          text: true,
+          timestamp: true,
+          updatedAt: true,
         },
       });
     }),
@@ -106,18 +127,39 @@ export const boardsRouter = router({
           },
           deleted: false,
         },
-        include: {
-          board: true,
+        select: {
           comments: {
-            orderBy: {
-              id: "desc",
-            },
             take: 3,
+            orderBy: {
+              timestamp: "desc",
+            },
+            select: {
+              id: true,
+              image: true,
+              text: true,
+              timestamp: true,
+              author: {
+                select: { name: true, image: true, id: true },
+              },
+            },
             where: {
               deleted: false,
             },
           },
-          author: true,
+          _count: { select: { comments: true } },
+          author: {
+            select: {
+              name: true,
+              image: true,
+              id: true,
+            },
+          },
+          id: true,
+          image: true,
+          subject: true,
+          timestamp: true,
+          updatedAt: true,
+          text: true,
         },
       });
 

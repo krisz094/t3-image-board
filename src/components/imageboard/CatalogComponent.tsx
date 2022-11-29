@@ -1,10 +1,66 @@
-import Image from "next/image";
+import { AdvancedImage, placeholder } from '@cloudinary/react';
+import { Resize } from '@cloudinary/url-gen/actions/resize';
+import type { User } from "@prisma/client";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { myCld } from "../../utils/cloudinary";
 import { trpc } from "../../utils/trpc";
 import { BoardsHead } from "./BoardsHead";
 import { HorizontalLine } from "./HorizontalLine";
 import ThreadCompose from "./ThreadCompose";
+
+interface CatalogThreadProps {
+  id: string;
+  updatedAt: Date | null;
+  author: User | null;
+  text: string | null;
+  image: string;
+  subject: string | null;
+  timestamp: Date;
+  comments: {
+    id: string;
+    image: string | null;
+  }[];
+  boardName: string;
+}
+
+function CatalogThread(props: CatalogThreadProps) {
+
+  const cldImg = useMemo(() => {
+    const img = myCld.image(props.image);
+
+    img.resize(Resize.fit(200, 200));
+
+    return img;
+  }, [props.image]);
+
+  return (
+    <div key={props.id} className="flex flex-col items-center leading-tight">
+      <Link href={`/${props.boardName}/thread/${props.id}`}>
+        <div className="cursor-pointer object-contain shadow-md transition-all hover:scale-105">
+          <AdvancedImage cldImg={cldImg} plugins={[placeholder({ mode: 'blur' })]} />
+        </div>
+      </Link>
+      <div>
+        {props.author ? (
+          <Link href={`/user/${props.author.id}`}>
+            <div className="font-bold text-purple-800">{props.author.name}</div>
+          </Link>
+        ) : (
+          <div className="font-bold text-green-700">Anonymous</div>
+        )}
+      </div>
+      {props.subject && (
+        <div className="font-bold text-blue-800">{props.subject}</div>
+      )}
+      <div className="text-xs font-thin">
+        R: {props.comments.length} | I:{" "}
+        {props.comments.filter((x) => !!x.image).length}
+      </div>
+      <div>{props.text?.slice(0, 100)}</div>
+    </div>
+  )
+}
 
 interface CatalogComponentProps {
   boardName: string;
@@ -61,34 +117,7 @@ function CatalogComponent({ boardName }: CatalogComponentProps) {
         }}
       >
         {catalogQ.data?.map((x) => (
-          <div key={x.id} className="flex flex-col items-center leading-tight">
-            <Link href={`/${boardName}/thread/${x.id}`}>
-              <Image
-                src={x.image}
-                width={200}
-                height={200}
-                alt=""
-                className="cursor-pointer object-contain shadow-md transition-all hover:scale-105"
-              />
-            </Link>
-            <div>
-              {x.author ? (
-                <Link href={`/user/${x.author.id}`}>
-                  <div className="font-bold text-purple-800">{x.author.name}</div>
-                </Link>
-              ) : (
-                <div className="font-bold text-green-700">Anonymous</div>
-              )}
-            </div>
-            {x.subject && (
-              <div className="font-bold text-blue-800">{x.subject}</div>
-            )}
-            <div className="text-xs font-thin">
-              R: {x.comments.length} | I:{" "}
-              {x.comments.filter((x) => !!x.image).length}
-            </div>
-            <div>{x.text?.slice(0, 100)}</div>
-          </div>
+          <CatalogThread key={x.id} {...x} boardName={boardName} />
         ))}
       </div>
     </div>
