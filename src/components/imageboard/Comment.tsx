@@ -4,7 +4,7 @@ import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNodeArray } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import Spotify from 'react-spotify-embed';
 import reactStringReplace from "react-string-replace";
 import YouTube from "react-youtube";
@@ -93,7 +93,7 @@ export function CommentTextToRichText(text: string | undefined | null) {
   return formatted;
 }
 
-export function Comment({
+export const Comment = memo(function Comment({
   id,
   image,
   text,
@@ -116,6 +116,7 @@ export function Comment({
   const formattedText = useMemo(() => CommentTextToRichText(text), [text]);
 
   const cldImg = useMemo(() => {
+    console.log(image)
     if (!image) {
       return undefined;
     }
@@ -142,7 +143,10 @@ export function Comment({
       >
         {cldImg && (
           <div
-            className='cursor-pointer'
+            className={clsx('cursor-pointer', {
+              'w-full sm:w-auto': imgExt,
+              [styles.childImgFull || '']: imgExt
+            })}
             onClick={(e) => {
               if (e.button == 0) {
                 setImgExt((v) => !v);
@@ -159,9 +163,9 @@ export function Comment({
             )}
             {author?.image && <Image src={author.image} alt="" width={24} height={24} className="object-contain rounded-full" />}
             {author ? (
-              <div className="font-bold text-purple-800 flex gap-0.5 ">{author.name}</div>
+              <div className="flex-1 font-bold text-purple-800 gap-0.5 ">{author.name}</div>
             ) : (
-              <div className="font-bold text-green-700">Anonymous</div>
+              <div className="flex-1 font-bold text-green-700">Anonymous</div>
             )}
             {isMounted && <div>{PrettyDateTimeComment(timestamp)}</div>}
             <div className="text-blue-800 cursor-pointer hover:underline" onClick={() => onIdClick && onIdClick(id)}>No. {id}</div>
@@ -185,4 +189,4 @@ export function Comment({
       </div>
     </div>
   );
-}
+});
