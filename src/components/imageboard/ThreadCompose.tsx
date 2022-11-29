@@ -70,7 +70,7 @@ function ThreadCompose({ boardName, setTxt, txt, txtFieldRef }: ThreadComposePro
                     accept="image/jpeg,image/png,image/webp"
                 />
 
-                <input type="submit" disabled={createThreadMut.isLoading} value={createThreadMut.isLoading ? "Submitting..." : "Create thread"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50" />
+                <input type="submit" disabled={createThreadMut.isLoading || ul} value={createThreadMut.isLoading || ul ? "Submitting..." : "Create thread"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50" />
             </form>
 
             {createThreadMut.error?.message && <div className="font-bold text-center text-lg text-red-600">{prettyError(createThreadMut.error?.message)}</div>}
