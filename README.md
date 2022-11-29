@@ -7,24 +7,19 @@ A simple image board implemented with the T3 stack.
 - [x] Boards
 - [x] Threads
 - [x] Commenting
-- [ ] Log IP and other data of comments for legal reasons
+- [x] Log IP and other data of comments for legal reasons
 - [ ] Ability to delete own comment/thread when logged in
 - [x] Catalog
 - [ ] Archive (High prio)
 - [x] Quoting style
 - [x] Login with Discord
-- [ ] Login with Google, etc
 - [ ] User page (Threads, comments, etc) (Low prio)
 - [x] Replying style + link (in thread view)
 - [ ] Replying style + link - Cross thread (High prio)
 - [ ] Replying style + link - Cross board (Mid prio)
-- [x] Image upload - Base64 in DB
-- [ ] Image upload - To CDN (High prio)
+- [x] Image upload - To CDN (High prio)
 - [ ] Captcha (Mid prio)
 - [x] Spoiler tags - Single Line
-- [ ] Spoiler tags - Multiline (Low prio)
-- [ ] Code tags - Multiline (Low prio)
-- [ ] Themes (Low prio)
 - [ ] Admin role (Mid prio)
 - [ ] Admin/Moderation subsite (Mid prio)
 
