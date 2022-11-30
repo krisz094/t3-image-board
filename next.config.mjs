@@ -4,6 +4,7 @@
  * This is especially useful for Docker builds.
  */
 !process.env.SKIP_ENV_VALIDATION && (await import("./src/env/server.mjs"));
+import withBundleAnalyzer from '@next/bundle-analyzer';
 
 /** @type {import("next").NextConfig} */
 const config = {
@@ -17,4 +18,6 @@ const config = {
     domains: ['cdn.discordapp.com']
   }
 };
-export default config;
+const analyzedConfig = withBundleAnalyzer()(config);
+
+export default analyzedConfig;
