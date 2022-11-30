@@ -203,7 +203,7 @@ export const Comment = memo(function Comment({
           "bg-brownmain-300": isReply,
           "shadow-md": isReply && !isQuoteTT,
           "shadow-xl": isQuoteTT,
-          "bg-red-400": isCurrent && !isQuoteTT,
+          "bg-brownmain-400": isCurrent && !isQuoteTT,
           "flex-col": imgExt,
           "flex-col sm:flex-row": !imgExt
         })}
