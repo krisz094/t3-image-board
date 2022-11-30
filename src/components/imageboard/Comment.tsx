@@ -52,7 +52,7 @@ function QuoteReplyHighlight({ id }: QuoteReplyHighlightProps) {
         <div
           ref={setTooltipRef}
           {...getTooltipProps({ className: 'tooltip-container' })}
-          className="p-0 "
+          className="m-2 border-[1px] border-brownmain-700 rounded-md overflow-hidden shadow-xl"
         >
           <Comment {...full} isReply isQuoteTT />
           <div {...getArrowProps({ className: 'tooltip-arrow' })} />
@@ -108,17 +108,11 @@ export function CommentTextToRichText(text: string | undefined | null) {
     return (
       <QuoteReplyHighlight key={match + i + (iFake++)} id={id} />
     )
-    /* return (
-      <Link key={match + i + (iFake++)} href={`#${match.replace('>>', '')}`}>
-        <span key={match + i + (iFake++)} className="text-red-700 hover:underline cursor-pointer">
-          {match}
-        </span>
-      </Link>) */
   });
 
   /* replace color quotes */
   formatted = reactStringReplace(formatted, /(>.*)/g, (match, i) => {
-    return <span key={match + i + (iFake++)} className="text-brownmain-600">{match}</span>
+    return <span key={match + i + (iFake++)} className="text-green-700">{match}</span>
   });
 
   /* add spoilers */
@@ -200,10 +194,8 @@ export const Comment = memo(function Comment({
       {isReply && !isQuoteTT && <div className="text-xs text-brownmain-800 hidden sm:block">{">>"}</div>}
       <div
         className={clsx("flex flex-wrap items-start gap-2 p-2 flex-1 sm:flex-initial rounded-sm", {
-          "bg-brownmain-300": isReply,
-          "shadow-md": isReply && !isQuoteTT,
-          "shadow-xl": isQuoteTT,
-          "bg-brownmain-400": isCurrent && !isQuoteTT,
+          "bg-brownmain-300 shadow-md": isReply,
+          "bg-brownmain-400": isCurrent || isQuoteTT,
           "flex-col": imgExt,
           "flex-col sm:flex-row": !imgExt
         })}
