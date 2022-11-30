@@ -16,6 +16,9 @@ const config = {
   },
   images: {
     domains: ['cdn.discordapp.com']
+  },
+  experimental: {
+    scrollRestoration: true
   }
 };
 
