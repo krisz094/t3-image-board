@@ -20,6 +20,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   });
 
   const boardName = context.params?.boardName as string;
+
+  const board = await ssg.boards.getByName.fetch({ boardName });
+  if (!board) {
+    return {
+      notFound: true,
+    }
+  }
+
   const threadId = context.params?.threadId as string;
 
   await Promise.all([

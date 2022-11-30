@@ -1,7 +1,7 @@
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import type {
-    GetServerSidePropsContext,
-    InferGetServerSidePropsType
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType
 } from "next";
 import { getSession } from "next-auth/react";
 import Head from "next/head";
@@ -20,6 +20,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   });
 
   const boardName = context.params?.boardName as string;
+
+  const board = await ssg.boards.getByName.fetch({ boardName });
+  if (!board) {
+    return {
+      notFound: true,
+    }
+  }
+
   const pageNum = +(context.params?.pageNum as string) || 0;
 
   await Promise.all([
