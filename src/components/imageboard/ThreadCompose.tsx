@@ -49,25 +49,25 @@ function ThreadCompose({ boardName, }: ThreadComposeProps) {
         <div className="flex items-center justify-center flex-col">
             <form onSubmit={e => { e.preventDefault(); submit(); }} className="w-full max-w-[500px] gap-1.5 px-2 grid grid-cols-12 bg-brownmain-700 text-white p-2 rounded-md">
 
-                <label className="col-span-3 text-brownmain-200 font-bold" htmlFor="subject">Subject</label>
+                <label className="col-span-12 sm:col-span-3 text-brownmain-200 font-bold" htmlFor="subject">Subject</label>
                 <input {...register('subject', {
                     disabled: createThreadMut.isLoading || ul,
                     maxLength: { value: 1000, message: 'Maximum length is 1000' }
-                })} className="col-span-9 outline-none p-1 resize-none rounded-sm shadow-md  bg-brownmain-50 text-black" />
-                {errors.subject?.message && <span className="col-start-4 col-span-9 text-red-500">{errors.replyText?.message}</span>}
+                })} className="col-span-12 sm:col-span-9 outline-none p-1 resize-none rounded-sm shadow-md  bg-brownmain-50 text-black" />
+                {errors.subject?.message && <span className="col-start-4 col-span-12 sm:col-span-9 text-red-500">{errors.replyText?.message}</span>}
 
-                <label className="col-span-3 text-brownmain-200 font-bold" htmlFor="replyText">Thread text</label>
+                <label className="col-span-12 sm:col-span-3 text-brownmain-200 font-bold" htmlFor="replyText">Thread text</label>
                 <textarea
                     {...register('replyText', {
                         disabled: createThreadMut.isLoading || ul,
                         maxLength: { value: 1000, message: 'Maximum length is 1000' },
                         required: 'Thread text is required'
                     })}
-                    className="col-span-9 outline-none p-1 resize-none rounded-sm shadow-md aspect-video bg-brownmain-50 text-black"
+                    className="col-span-12 sm:col-span-9 outline-none p-1 resize-none rounded-sm shadow-md aspect-video bg-brownmain-50 text-black"
                 />
-                {errors.replyText?.message && <span className="col-start-4 col-span-9 text-red-500">{errors.replyText?.message}</span>}
+                {errors.replyText?.message && <span className="col-start-4 col-span-12 sm:col-span-9 text-red-500">{errors.replyText?.message}</span>}
 
-                <label className="col-span-3 text-brownmain-200 font-bold" htmlFor="media">Image</label>
+                <label className="col-span-12 sm:col-span-3 text-brownmain-200 font-bold" htmlFor="media">Image</label>
                 <input
                     {...register('media', {
                         disabled: createThreadMut.isLoading || ul,
@@ -89,16 +89,16 @@ function ThreadCompose({ boardName, }: ThreadComposeProps) {
                             }
                         }
                     })}
-                    className="col-span-9"
+                    className="col-span-12 sm:col-span-9"
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
                 />
-                {ul && <div className="col-span-full">
+                {ul && <div className="col-span-12 sm:col-span-full">
                     <ProgressBar progress={Math.round(ulPrg * 100)} />
                 </div>}
-                {errors.media?.message && <span className="col-start-4 col-span-9 text-red-500">{errors.media?.message}</span>}
+                {errors.media?.message && <span className="col-start-4 col-span-12 sm:col-span-9 text-red-500">{errors.media?.message}</span>}
 
-                <input disabled={createThreadMut.isLoading || ul} type="submit" value={createThreadMut.isLoading || ul ? "Submitting..." : "Create thread"} className="col-span-12 rounded-md px-2 py-1 shadow-md cursor-pointer bg-brownmain-50 disabled:cursor-wait text-brownmain-800 font-bold" />
+                <input disabled={createThreadMut.isLoading || ul} type="submit" value={createThreadMut.isLoading || ul ? "Submitting..." : "Create thread"} className="col-span-12 sm:col-span-12 rounded-md px-2 py-1 shadow-md cursor-pointer bg-brownmain-50 disabled:cursor-wait text-brownmain-800 font-bold" />
             </form>
             {createThreadMut.error?.message && <div className="font-bold text-center text-lg text-red-600">{prettyError(createThreadMut.error?.message)}</div>}
         </div>
