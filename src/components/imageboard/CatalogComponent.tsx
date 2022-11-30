@@ -44,14 +44,14 @@ function CatalogThread(props: CatalogThreadProps) {
       <div>
         {props.author ? (
           <Link href={`/user/${props.author.id}`}>
-            <div className="font-bold text-purple-800">{props.author.name}</div>
+            <div className="font-bold text-brownmain-800">{props.author.name}</div>
           </Link>
         ) : (
-          <div className="font-bold text-green-700">Anonymous</div>
+          <div className="font-bold text-brownmain-700">Anonymous</div>
         )}
       </div>
       {props.subject && (
-        <div className="font-bold text-blue-800">{props.subject}</div>
+        <div className="font-bold text-brownmain-800">{props.subject}</div>
       )}
       <div className="text-xs font-thin">
         R: {props.comments.length} | I:{" "}

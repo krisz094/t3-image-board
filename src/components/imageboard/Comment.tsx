@@ -61,7 +61,7 @@ export function CommentTextToRichText(text: string | undefined | null) {
 
   /* replace color quotes */
   formatted = reactStringReplace(formatted, /(>.*)/g, (match, i) => {
-    return <span key={match + i + (iFake++)} className="text-green-600">{match}</span>
+    return <span key={match + i + (iFake++)} className="text-brownmain-600">{match}</span>
   });
 
   /* add spoilers */
@@ -86,7 +86,7 @@ export function CommentTextToRichText(text: string | undefined | null) {
       return <Spotify key={match + i + (iFake++)} link={link} />;
     }
     else {
-      return <a className="text-blue-800 hover:underline" key={match + i + (iFake++)} href={match} target={"_blank"} rel="noreferrer">[link]</a>
+      return <a className="text-brownmain-800 hover:underline" key={match + i + (iFake++)} href={match} target={"_blank"} rel="noreferrer">[link]</a>
     }
   })
 
@@ -133,10 +133,10 @@ export const Comment = memo(function Comment({
 
   return (
     <div className="flex gap-1" id={id}>
-      {isReply && <div className="text-xs text-blue-800 hidden sm:block">{">>"}</div>}
+      {isReply && <div className="text-xs text-brownmain-800 hidden sm:block">{">>"}</div>}
       <div
         className={clsx("flex flex-wrap items-start gap-2 p-2 flex-1 sm:flex-initial", {
-          "rounded-sm bg-blue-300/80 shadow-md": isReply,
+          "rounded-sm bg-brownmain-300/80 shadow-md": isReply,
           "flex-col": imgExt,
           "flex-col sm:flex-row": !imgExt
         })}
@@ -159,21 +159,21 @@ export const Comment = memo(function Comment({
         <div className="flex flex-1 flex-col gap-2">
           <div className="flex flex-wrap gap-1.5 text-sm">
             {subject && (
-              <div className="font-bold text-blue-800">{subject}</div>
+              <div className="font-bold text-brownmain-800">{subject}</div>
             )}
             {author?.image && <Image src={author.image} alt="" width={24} height={24} className="object-contain rounded-full" />}
             {author ? (
-              <div className="flex-1 font-bold text-purple-800 gap-0.5 ">{author.name}</div>
+              <div className="flex-1 font-bold text-brownmain-800 gap-0.5 ">{author.name}</div>
             ) : (
-              <div className="flex-1 font-bold text-green-700">Anonymous</div>
+              <div className="flex-1 font-bold text-brownmain-700">Anonymous</div>
             )}
             {isMounted && <div>{PrettyDateTimeComment(timestamp)}</div>}
-            <div className="text-blue-800 cursor-pointer hover:underline" onClick={() => onIdClick && onIdClick(id)}>No. {id}</div>
+            <div className="text-brownmain-800 cursor-pointer hover:underline" onClick={() => onIdClick && onIdClick(id)}>No. {id}</div>
             {boardName && (
               <Link href={`/${boardName}/thread/${id}`}>
                 <div className="group">
                   [
-                  <span className="text-blue-900 group-hover:underline">
+                  <span className="text-brownmain-900 group-hover:underline">
                     Reply
                   </span>
                   ]

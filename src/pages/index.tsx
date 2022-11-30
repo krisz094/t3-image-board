@@ -49,14 +49,14 @@ const Home: NextPage = () => {
 
         <h1 className="font-bold text-3xl mb-2">Welcome to 3Board</h1>
 
-        <div className="flex gap-2 flex-col bg-gradient-to-b from-blue-300 to-blue-400 p-3 w-[300px] rounded-md shadow-md">
+        <div className="flex gap-2 flex-col bg-gradient-to-b from-brownmain-300 to-brownmain-400 p-3 w-[300px] rounded-md shadow-md">
 
           {boardsQ.isLoading ? <div>Loading boards...</div> : null}
 
           {boardsQ.data?.length === 0 && <div>There are no boards</div>}
 
           {boardsQ.data?.map(x => <Link key={x.id} href={`/${x.name}`}>
-            <div key={x.id} className="transition-all hover:underline hover:text-blue-600">
+            <div key={x.id} className="transition-all hover:underline hover:text-brownmain-600">
               <span className="font-bold">/{x.name}/</span>
               <span> - </span>
               <span>{x.description}</span>

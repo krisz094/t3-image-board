@@ -7,6 +7,6 @@ body {
 
 @layer base {
   body {
-    @apply min-h-[100vh] bg-gradient-to-b from-blue-100 to-blue-200 ;
+    @apply min-h-[100vh] bg-gradient-to-b from-brownmain-100 to-brownmain-200 ;
   }
 }

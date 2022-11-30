@@ -1,3 +1,3 @@
 export function HorizontalLine() {
-    return <hr className="border-blue-900/20" />;
+    return <hr className="border-brownmain-900/20" />;
 }

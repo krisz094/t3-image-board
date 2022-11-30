@@ -14,7 +14,7 @@ export function BoardsHead({ isCatalog }: BoardsHeadProps) {
   return (
     <div className="flex w-full gap-2 text-sm">
       <div>
-        <span className="mr-2 text-blue-400">[</span>
+        <span className="mr-2 text-brownmain-400">[</span>
         {boardsQ.data?.map((x, idx, arr) => (
           <span key={x.id}>
             <Link href={`/${x.name}${isCatalog ? "/catalog" : ""}`}>
@@ -23,15 +23,15 @@ export function BoardsHead({ isCatalog }: BoardsHeadProps) {
               </span>
             </Link>
             {idx != arr.length - 1 && (
-              <span className="px-2 text-blue-400">/</span>
+              <span className="px-2 text-brownmain-400">/</span>
             )}
           </span>
         ))}
-        <span className="ml-2 text-blue-400">]</span>
+        <span className="ml-2 text-brownmain-400">]</span>
       </div>
 
       <div>
-        <span className="mr-2 text-blue-400">[</span>
+        <span className="mr-2 text-brownmain-400">[</span>
 
         {sessionData?.user?.name ? (
           <span>Logged in as {sessionData.user.name} - </span>
@@ -43,7 +43,7 @@ export function BoardsHead({ isCatalog }: BoardsHeadProps) {
           {" "}
           {sessionData ? "Sign out" : "Sign in"}
         </span>
-        <span className="ml-2 text-blue-400">]</span>
+        <span className="ml-2 text-brownmain-400">]</span>
       </div>
     </div>
   );

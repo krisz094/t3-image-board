@@ -101,7 +101,7 @@ const BoardComponent = memo(function BoardComp({
       </div>
 
       {!!threadsQ.data?.length && (
-        <div className="inline-block space-x-1 rounded-md bg-blue-300 p-2 shadow-md">
+        <div className="inline-block space-x-1 rounded-md bg-brownmain-300 p-2 shadow-md">
           {Array(pageNumQ.data || 1)
             .fill("")
             .map((x, idx) => idx + 1)

@@ -53,7 +53,7 @@ function ReplyCompose({ threadId, setTxt, txt, txtFieldRef }: Props) {
                     }}
                     accept="image/jpeg,image/png,image/webp"
                 />
-                <input disabled={replyMut.isLoading || ul} type="submit" value={replyMut.isLoading || ul ? "Submitting..." : "Add reply"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-blue-50 disabled:cursor-wait" />
+                <input disabled={replyMut.isLoading || ul} type="submit" value={replyMut.isLoading || ul ? "Submitting..." : "Add reply"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-brownmain-50 disabled:cursor-wait" />
             </form>
             {replyMut.error?.message && <div className="font-bold text-center text-lg text-red-600">{prettyError(replyMut.error?.message)}</div>}
         </>
