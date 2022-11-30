@@ -28,6 +28,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     ssg.threads.getById.prefetch({ id: threadId }),
   ]);
 
+  context.res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=5, stale-while-revalidate=10'
+  );
+
   return {
     props: {
       trpcState: ssg.dehydrate(),

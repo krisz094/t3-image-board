@@ -1,7 +1,7 @@
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import type {
   GetServerSidePropsContext,
-  InferGetServerSidePropsType,
+  InferGetServerSidePropsType
 } from "next";
 import { getSession } from "next-auth/react";
 import Head from "next/head";
@@ -25,6 +25,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     ssg.boards.getByName.prefetch({ boardName }),
     ssg.boards.getArchiveThreads.prefetch({ boardName }),
   ]);
+
+  context.res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=5, stale-while-revalidate=10'
+  );
 
   return {
     props: {

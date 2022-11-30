@@ -28,6 +28,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     ssg.boards.getPage.prefetch({ boardName, pageNum: 1 }),
   ]);
 
+  context.res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=5, stale-while-revalidate=10'
+  );
+
   return {
     props: {
       trpcState: ssg.dehydrate(),

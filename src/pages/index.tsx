@@ -22,6 +22,11 @@ export async function getServerSideProps(
 
   await ssg.boards.getAll.prefetch();
 
+  context.res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=5, stale-while-revalidate=10'
+  );
+
   return {
     props: {
       trpcState: ssg.dehydrate(),
