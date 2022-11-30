@@ -20,7 +20,7 @@ A simple image board implemented with the T3 stack.
 - [x] Image upload - To CDN (High prio)
 - [ ] Captcha (Mid prio)
 - [x] Spoiler tags - Single Line
-- [ ] Admin role (Mid prio)
+- [x] Admin role (Mid prio) - ADMIN_EMAIL can remove threads/posts
 - [ ] Admin/Moderation subsite (Mid prio)
 
 ## Pictures
