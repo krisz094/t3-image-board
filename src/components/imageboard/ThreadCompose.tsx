@@ -54,7 +54,7 @@ function ThreadCompose({ boardName, }: ThreadComposeProps) {
                     disabled: createThreadMut.isLoading || ul,
                     maxLength: { value: 1000, message: 'Maximum length is 1000' }
                 })} className="col-span-12 sm:col-span-9 outline-none p-1 resize-none rounded-sm shadow-md  bg-brownmain-50 text-black" />
-                {errors.subject?.message && <span className="col-start-4 col-span-12 sm:col-span-9 text-red-500">{errors.replyText?.message}</span>}
+                {errors.subject?.message && <span className="sm:col-start-4 col-span-12 sm:col-span-9 text-red-500">{errors.replyText?.message}</span>}
 
                 <label className="col-span-12 sm:col-span-3 text-brownmain-200 font-bold" htmlFor="replyText">Thread text</label>
                 <textarea
@@ -65,7 +65,7 @@ function ThreadCompose({ boardName, }: ThreadComposeProps) {
                     })}
                     className="col-span-12 sm:col-span-9 outline-none p-1 resize-none rounded-sm shadow-md aspect-video bg-brownmain-50 text-black"
                 />
-                {errors.replyText?.message && <span className="col-start-4 col-span-12 sm:col-span-9 text-red-500">{errors.replyText?.message}</span>}
+                {errors.replyText?.message && <span className="sm:col-start-4 col-span-12 sm:col-span-9 text-red-500">{errors.replyText?.message}</span>}
 
                 <label className="col-span-12 sm:col-span-3 text-brownmain-200 font-bold" htmlFor="media">Image</label>
                 <input
@@ -96,7 +96,7 @@ function ThreadCompose({ boardName, }: ThreadComposeProps) {
                 {ul && <div className="col-span-12 sm:col-span-full">
                     <ProgressBar progress={Math.round(ulPrg * 100)} />
                 </div>}
-                {errors.media?.message && <span className="col-start-4 col-span-12 sm:col-span-9 text-red-500">{errors.media?.message}</span>}
+                {errors.media?.message && <span className="sm:col-start-4 col-span-12 sm:col-span-9 text-red-500">{errors.media?.message}</span>}
 
                 <input disabled={createThreadMut.isLoading || ul} type="submit" value={createThreadMut.isLoading || ul ? "Submitting..." : "Create thread"} className="col-span-12 sm:col-span-12 rounded-md px-2 py-1 shadow-md cursor-pointer bg-brownmain-50 disabled:cursor-wait text-brownmain-800 font-bold" />
             </form>
