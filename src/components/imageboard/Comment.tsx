@@ -159,13 +159,13 @@ export const Comment = memo(function Comment({
         <div className="flex flex-1 flex-col gap-2">
           <div className="flex flex-wrap gap-1.5 text-sm">
             {subject && (
-              <div className="font-bold text-brownmain-800">{subject}</div>
+              <div className="font-bold text-blue-800">{subject}</div>
             )}
             {author?.image && <Image src={author.image} alt="" width={24} height={24} className="object-contain rounded-full" />}
             {author ? (
-              <div className="flex-1 font-bold text-brownmain-800 gap-0.5 ">{author.name}</div>
+              <div className="flex-1 font-bold text-purple-800 gap-0.5 ">{author.name}</div>
             ) : (
-              <div className="flex-1 font-bold text-brownmain-700">Anonymous</div>
+              <div className="flex-1 font-bold text-green-700">Anonymous</div>
             )}
             {isMounted && <div>{PrettyDateTimeComment(timestamp)}</div>}
             <div className="text-brownmain-800 cursor-pointer hover:underline" onClick={() => onIdClick && onIdClick(id)}>No. {id}</div>
