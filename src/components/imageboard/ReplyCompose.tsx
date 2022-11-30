@@ -87,7 +87,7 @@ function ReplyCompose({ threadId }: Props) {
                 </div>}
                 {errors.media?.message && <span className="col-start-4 col-span-9 text-red-500">{errors.media?.message}</span>}
 
-                <input disabled={replyMut.isLoading || ul} type="submit" value={replyMut.isLoading || ul ? "Submitting..." : "Add reply"} className="col-span-12 rounded-md px-2 py-1 shadow-md cursor-pointer bg-brownmain-50 disabled:cursor-wait text-black font-bold" />
+                <input disabled={replyMut.isLoading || ul} type="submit" value={replyMut.isLoading || ul ? "Submitting..." : "Add reply"} className="col-span-12 rounded-md px-2 py-1 shadow-md cursor-pointer bg-brownmain-50 disabled:cursor-wait text-brownmain-800 font-bold" />
             </form>
             {replyMut.error?.message && <div className="font-bold text-center text-lg text-red-600">{prettyError(replyMut.error?.message)}</div>}
         </div>

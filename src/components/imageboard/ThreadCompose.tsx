@@ -98,7 +98,7 @@ function ThreadCompose({ boardName, }: ThreadComposeProps) {
                 </div>}
                 {errors.media?.message && <span className="col-start-4 col-span-9 text-red-500">{errors.media?.message}</span>}
 
-                <input disabled={createThreadMut.isLoading || ul} type="submit" value={createThreadMut.isLoading || ul ? "Submitting..." : "Add reply"} className="col-span-12 rounded-md px-2 py-1 shadow-md cursor-pointer bg-brownmain-50 disabled:cursor-wait text-black font-bold" />
+                <input disabled={createThreadMut.isLoading || ul} type="submit" value={createThreadMut.isLoading || ul ? "Submitting..." : "Create thread"} className="col-span-12 rounded-md px-2 py-1 shadow-md cursor-pointer bg-brownmain-50 disabled:cursor-wait text-brownmain-800 font-bold" />
             </form>
             {createThreadMut.error?.message && <div className="font-bold text-center text-lg text-red-600">{prettyError(createThreadMut.error?.message)}</div>}
         </div>
