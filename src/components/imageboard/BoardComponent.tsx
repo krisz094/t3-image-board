@@ -1,12 +1,18 @@
 import clsx from "clsx";
 import Link from "next/link";
-import { memo, useMemo, useRef, useState } from "react";
-import { appendIdToComment } from "../../utils/appendIdToComment";
+import { memo, useMemo } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import { trpc } from "../../utils/trpc";
 import { BoardsHead } from "./BoardsHead";
 import { Comment } from "./Comment";
 import { HorizontalLine } from "./HorizontalLine";
 import ThreadCompose from "./ThreadCompose";
+
+export interface ThreadFormProps {
+  replyText: string;
+  media: File[];
+  subject: string;
+}
 
 interface BoardComponentProps {
   pageNum: number;
@@ -17,6 +23,8 @@ const BoardComponent = memo(function BoardComp({
   pageNum,
   boardName,
 }: BoardComponentProps) {
+  const formMethods = useForm<ThreadFormProps>();
+
   /* Queries */
   const boardQ = trpc.boards.getByName.useQuery({ boardName });
   const pageNumQ = trpc.boards.getPageNum.useQuery({ boardName });
@@ -36,8 +44,6 @@ const BoardComponent = memo(function BoardComp({
     }
   });
 
-  const [txt, setTxt] = useState('');
-  const fieldRef = useRef<HTMLTextAreaElement>(null);
 
   if (boardQ.isLoading) {
     return <div className=" space-y-2 p-2">Loading...</div>;
@@ -49,13 +55,15 @@ const BoardComponent = memo(function BoardComp({
     <div className="w-full space-y-2 p-2">
       <BoardsHead />
 
-      <h1 className="w-full text-center text-3xl font-bold">
-        <span className="font-bold">/{boardQ.data?.name}/</span>
+      <h1 className="font-sans font-bold text-red-800 text-3xl text-center w-full ">
+        <span>/{boardQ.data?.name}/</span>
         <span> - </span>
         <span>{boardQ.data?.description}</span>
       </h1>
 
-      <ThreadCompose boardName={boardName} setTxt={setTxt} txt={txt} txtFieldRef={fieldRef} />
+      <FormProvider {...formMethods}>
+        <ThreadCompose boardName={boardName} />
+      </FormProvider>
 
       <HorizontalLine />
 
@@ -85,7 +93,10 @@ const BoardComponent = memo(function BoardComp({
 
         {threadsQ.data?.map((x) => (
           <div key={x.id} className="flex w-full flex-1 flex-col gap-2">
-            <Comment {...x} boardName={boardName} key={x.id} onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} onDelClick={isAdmin ? id => delThreadMut.mutate({ id }) : undefined} />
+            <Comment {...x} boardName={boardName} key={x.id} onIdClick={id => {
+              formMethods.setValue('replyText', formMethods.getValues('replyText') + ">>" + id + "\n");
+              formMethods.setFocus('replyText');
+            }} onDelClick={isAdmin ? id => delThreadMut.mutate({ id }) : undefined} />
 
             {x._count.comments > 3 && <div className="sm:pl-4">3 out of {x._count.comments} replies shown. <Link href={`/${boardName}/thread/${x.id}`}><span className="underline">View thread</span></Link></div>}
 
@@ -93,7 +104,10 @@ const BoardComponent = memo(function BoardComp({
               .slice()
               .reverse()
               .map((y) => (
-                <Comment key={y.id} isReply {...y} onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} onDelClick={isAdmin ? id => delCommentMut.mutate({ id }) : undefined} />
+                <Comment key={y.id} isReply {...y} onIdClick={id => {
+                  formMethods.setValue('replyText', formMethods.getValues('replyText') + ">>" + id + "\n");
+                  formMethods.setFocus('replyText');
+                }} onDelClick={isAdmin ? id => delCommentMut.mutate({ id }) : undefined} />
               ))}
             <HorizontalLine />
           </div>

@@ -1,80 +1,107 @@
 import { useRouter } from "next/router";
-import type { RefObject } from "react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { postImage } from "../../utils/postImage";
 import { prettyError } from "../../utils/prettyError";
 import { trpc } from "../../utils/trpc";
+import { ProgressBar } from "../ui/ProgressBar";
+import type { ThreadFormProps } from "./BoardComponent";
 
 interface ThreadComposeProps {
     boardName: string;
-    txt: string;
-    setTxt: (txt: string) => void;
-    txtFieldRef?: RefObject<HTMLTextAreaElement>;
 }
 
-function ThreadCompose({ boardName, setTxt, txt, txtFieldRef }: ThreadComposeProps) {
+function ThreadCompose({ boardName, }: ThreadComposeProps) {
     const router = useRouter();
 
     const createThreadMut = trpc.threads.create.useMutation();
 
-    const [sub, setSub] = useState('');
-    const [img, setImg] = useState<File | null>(null);
+    const { register, handleSubmit, formState: { errors } } = useFormContext<ThreadFormProps>();
     const [ul, setUl] = useState(false);
-
-    const fileRef = useRef<HTMLInputElement>(null);
+    const [ulPrg, setUlPrg] = useState(0);
 
     const submit = useCallback(async () => {
-        if (!img) {
-            return;
-        }
-
         try {
-            setUl(true);
-            const imgResp = await postImage(img);
-            setUl(false);
+            await handleSubmit(async vals => {
 
-            const th = await createThreadMut.mutateAsync({
-                boardName,
-                text: txt,
-                image: imgResp.public_id,
-                subject: sub.trim() || null
-            });
+                setUl(true);
+                const imgResp = await postImage(vals.media[0] as File, ({ progress }) => { setUlPrg(progress) });
+                setUl(false);
 
-            setTxt('');
-            setImg(null);
-            setSub('');
-            if (fileRef.current) {
-                fileRef.current.value = '';
-            }
+                const th = await createThreadMut.mutateAsync({
+                    boardName,
+                    subject: vals.subject.trim(),
+                    text: vals.replyText.trim(),
+                    image: imgResp.data.public_id,
+                });
 
-            router.push(`/${boardName}/thread/${th.id}`)
+                router.push(`/${boardName}/thread/${th.id}`)
+
+            })();
         }
         catch (err) {
             setUl(false);
-            console.log('new thread err');
+            console.log('reply err')
         }
-
-    }, [boardName, createThreadMut, img, router, setTxt, sub, txt]);
+    }, [boardName, createThreadMut, handleSubmit, router]);
 
     return (
-        <>
-            <form onSubmit={e => { e.preventDefault(); submit(); }} className="flex flex-col gap-1.5 items-center px-2">
-                <input type="text" placeholder="Subject" value={sub} onChange={e => setSub(e.target.value)} className="outline-none p-1 rounded-sm shadow-md w-full max-w-[400px]" />
-                <textarea ref={txtFieldRef} placeholder="Thread text" value={txt} onChange={e => setTxt(e.target.value)} className="outline-none p-1 resize-none rounded-sm shadow-md aspect-video w-full max-w-[400px]" />
+        <div className="flex items-center justify-center flex-col">
+            <form onSubmit={e => { e.preventDefault(); submit(); }} className="w-full max-w-[500px] gap-1.5 px-2 grid grid-cols-12 bg-brownmain-700 text-white p-2 rounded-md">
+
+                <label className="col-span-3 text-brownmain-200 font-bold" htmlFor="subject">Subject</label>
+                <input {...register('subject', {
+                    disabled: createThreadMut.isLoading || ul,
+                    maxLength: { value: 1000, message: 'Maximum length is 1000' }
+                })} className="col-span-9 outline-none p-1 resize-none rounded-sm shadow-md  bg-brownmain-50 text-black" />
+                {errors.subject?.message && <span className="col-start-4 col-span-9 text-red-500">{errors.replyText?.message}</span>}
+
+                <label className="col-span-3 text-brownmain-200 font-bold" htmlFor="replyText">Thread text</label>
+                <textarea
+                    {...register('replyText', {
+                        disabled: createThreadMut.isLoading || ul,
+                        maxLength: { value: 1000, message: 'Maximum length is 1000' },
+                        required: 'Thread text is required'
+                    })}
+                    className="col-span-9 outline-none p-1 resize-none rounded-sm shadow-md aspect-video bg-brownmain-50 text-black"
+                />
+                {errors.replyText?.message && <span className="col-start-4 col-span-9 text-red-500">{errors.replyText?.message}</span>}
+
+                <label className="col-span-3 text-brownmain-200 font-bold" htmlFor="media">Image</label>
                 <input
+                    {...register('media', {
+                        disabled: createThreadMut.isLoading || ul,
+                        required: 'An image is required',
+                        validate: files => {
+                            const f = files[0];
+
+                            if (files.length > 1) {
+                                return 'Only one image can be selected';
+                            }
+                            else if (!f) {
+                                return 'An image is required';
+                            }
+                            else if (!['image/jpeg', 'image/png', 'image/webp'].includes(f.type)) {
+                                return 'File needs to be JPG, PNG or WEBP';
+                            }
+                            else {
+                                return true;
+                            }
+                        }
+                    })}
+                    className="col-span-9"
                     type="file"
-                    onChange={e => {
-                        const f = e.target.files?.length ? e.target.files[0] || null : null;
-                        setImg(f);
-                    }}
                     accept="image/jpeg,image/png,image/webp"
                 />
+                {ul && <div className="col-span-full">
+                    <ProgressBar progress={Math.round(ulPrg * 100)} />
+                </div>}
+                {errors.media?.message && <span className="col-start-4 col-span-9 text-red-500">{errors.media?.message}</span>}
 
-                <input type="submit" disabled={createThreadMut.isLoading || ul} value={createThreadMut.isLoading || ul ? "Submitting..." : "Create thread"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-brownmain-50" />
+                <input disabled={createThreadMut.isLoading || ul} type="submit" value={createThreadMut.isLoading || ul ? "Submitting..." : "Add reply"} className="col-span-12 rounded-md px-2 py-1 shadow-md cursor-pointer bg-brownmain-50 disabled:cursor-wait text-black font-bold" />
             </form>
-
             {createThreadMut.error?.message && <div className="font-bold text-center text-lg text-red-600">{prettyError(createThreadMut.error?.message)}</div>}
-        </>
+        </div>
     )
 }
 

@@ -1,7 +1,7 @@
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import type {
-  GetServerSidePropsContext,
-  InferGetServerSidePropsType
+    GetServerSidePropsContext,
+    InferGetServerSidePropsType
 } from "next";
 import { getSession } from "next-auth/react";
 import Head from "next/head";
@@ -30,7 +30,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   context.res.setHeader(
     'Cache-Control',
-    'public, s-maxage=5, stale-while-revalidate=10'
+    'public, s-maxage=15, stale-while-revalidate=60'
   );
 
   return {

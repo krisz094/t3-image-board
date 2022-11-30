@@ -1,16 +1,22 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { memo, useMemo, useRef, useState } from "react";
-import { appendIdToComment } from "../../utils/appendIdToComment";
+import { memo, useMemo } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import { trpc } from "../../utils/trpc";
 import { BoardsHead } from "./BoardsHead";
 import { Comment } from "./Comment";
 import { HorizontalLine } from "./HorizontalLine";
 import ReplyCompose from "./ReplyCompose";
 
+export interface ReplyFormProps {
+    replyText: string;
+    media: File[];
+}
+
 const ThreadComponent = memo(function ThreadComp({ threadId, boardName }: { threadId: string, boardName: string }) {
     const router = useRouter();
 
+    const formMethods = useForm<ReplyFormProps>();
     const trpcC = trpc.useContext();
     const boardQ = trpc.boards.getByName.useQuery({ boardName });
     const threadQ = trpc.threads.getById.useQuery({ id: threadId });
@@ -40,9 +46,6 @@ const ThreadComponent = memo(function ThreadComp({ threadId, boardName }: { thre
         }
     });
 
-    const [txt, setTxt] = useState('');
-    const fieldRef = useRef<HTMLTextAreaElement>(null);
-
     if (boardQ.isLoading) {
         return <div>Loading...</div>
     }
@@ -55,13 +58,15 @@ const ThreadComponent = memo(function ThreadComp({ threadId, boardName }: { thre
 
             <BoardsHead />
 
-            <h1 className="font-bold text-3xl text-center w-full">
-                <span className="font-bold">/{boardQ.data?.name}/</span>
+            <h1 className="font-sans font-bold text-red-800 text-3xl text-center w-full ">
+                <span>/{boardQ.data?.name}/</span>
                 <span> - </span>
                 <span>{boardQ.data?.description}</span>
             </h1>
 
-            <ReplyCompose threadId={threadId} setTxt={setTxt} txt={txt} txtFieldRef={fieldRef} />
+            <FormProvider {...formMethods} >
+                <ReplyCompose threadId={threadId} />
+            </FormProvider>
 
             <HorizontalLine />
 
@@ -89,12 +94,29 @@ const ThreadComponent = memo(function ThreadComp({ threadId, boardName }: { thre
 
             <div className="flex flex-col items-start gap-2 ">
 
-                {threadQ.data && <Comment {...threadQ.data} onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} onDelClick={isAdmin ? id => delThreadMut.mutate({ id }) : undefined} />}
+                {threadQ.data && (
+                    <Comment
+                        {...threadQ.data}
+                        onIdClick={id => {
+                            formMethods.setValue('replyText', formMethods.getValues('replyText') + ">>" + id + "\n");
+                            formMethods.setFocus('replyText')
+                        }}
+                        onDelClick={isAdmin ? id => delThreadMut.mutate({ id }) : undefined} />
+                )}
 
                 {threadQ.data?.comments.length === 0 && <div className="text-center w-full">No replies yet</div>}
 
                 {threadQ.data?.comments.map(x => (
-                    <Comment {...x} key={x.id} isReply onIdClick={id => appendIdToComment(id, setTxt, fieldRef)} onDelClick={isAdmin ? id => delCommentMut.mutate({ id }) : undefined} />
+                    <Comment
+                        {...x}
+                        key={x.id}
+                        isReply
+                        onIdClick={id => {
+                            formMethods.setValue('replyText', formMethods.getValues('replyText') + ">>" + id + "\n");
+                            formMethods.setFocus('replyText')
+                        }}
+                        onDelClick={isAdmin ? id => delCommentMut.mutate({ id }) : undefined}
+                    />
                 ))}
 
             </div>

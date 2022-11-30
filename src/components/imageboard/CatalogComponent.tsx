@@ -2,9 +2,11 @@ import { AdvancedImage } from '@cloudinary/react';
 import { Resize } from '@cloudinary/url-gen/actions/resize';
 import type { User } from "@prisma/client";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { FormProvider, useForm } from 'react-hook-form';
 import { myCld } from "../../utils/cloudinary";
 import { trpc } from "../../utils/trpc";
+import type { ThreadFormProps } from './BoardComponent';
 import { BoardsHead } from "./BoardsHead";
 import { HorizontalLine } from "./HorizontalLine";
 import ThreadCompose from "./ThreadCompose";
@@ -67,10 +69,10 @@ interface CatalogComponentProps {
 }
 
 function CatalogComponent({ boardName }: CatalogComponentProps) {
+  const formMethods = useForm<ThreadFormProps>();
+
   const boardQ = trpc.boards.getByName.useQuery({ boardName });
   const catalogQ = trpc.boards.getCatalogThreads.useQuery({ boardName });
-
-  const [txt, setTxt] = useState('');
 
   return (
     <div className="w-full space-y-2 p-2">
@@ -82,7 +84,9 @@ function CatalogComponent({ boardName }: CatalogComponentProps) {
         <span>{boardQ.data?.description}</span>
       </h1>
 
-      <ThreadCompose boardName={boardName} setTxt={setTxt} txt={txt} />
+      <FormProvider {...formMethods}>
+        <ThreadCompose boardName={boardName} />
+      </FormProvider>
 
       <HorizontalLine />
 

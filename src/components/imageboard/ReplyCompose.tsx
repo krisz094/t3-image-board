@@ -1,62 +1,96 @@
-import type { RefObject } from "react";
 import { useCallback, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { postImage } from "../../utils/postImage";
 import { prettyError } from "../../utils/prettyError";
 import { trpc } from "../../utils/trpc";
+import { ProgressBar } from "../ui/ProgressBar";
+import type { ReplyFormProps } from "./ThreadComponent";
 
 interface Props {
     threadId: string;
-    txt: string;
-    setTxt: (txt: string) => void
-    txtFieldRef?: RefObject<HTMLTextAreaElement>;
 }
 
-function ReplyCompose({ threadId, setTxt, txt, txtFieldRef }: Props) {
+function ReplyCompose({ threadId }: Props) {
     const tCtx = trpc.useContext();
     const replyMut = trpc.threads.reply.useMutation();
 
-    const [img, setImg] = useState<File | null>(null);
+    const { reset: resetForm, register, handleSubmit, formState: { errors }, setError } = useFormContext<ReplyFormProps>();
     const [ul, setUl] = useState(false);
+    const [ulPrg, setUlPrg] = useState(0);
 
     const submit = useCallback(async () => {
         try {
-            setUl(true);
-            const imgResp = img ? await postImage(img) : undefined;
-            setUl(false);
+            await handleSubmit(async vals => {
+                if (!vals.replyText.trim() && !vals.media[0]) {
+                    return setError('replyText', { message: 'Reply needs to either have text or image' })
+                }
 
-            await replyMut.mutateAsync({
-                threadId,
-                text: txt.trim() || null,
-                image: imgResp ? imgResp.public_id : null,
-            });
+                vals.media[0] && setUl(true);
+                const imgResp = vals.media[0] ? await postImage(vals.media[0], ({ progress }) => { setUlPrg(progress) }) : undefined;
+                vals.media[0] && setUl(false);
 
-            setTxt('');
-            setImg(null);
+                await replyMut.mutateAsync({
+                    threadId,
+                    text: vals.replyText.trim(),
+                    image: imgResp ? imgResp.data.public_id : null,
+                });
 
-            await tCtx.threads.getById.refetch({ id: threadId });
+                resetForm({
+                    media: [],
+                    replyText: ''
+                });
+
+                await tCtx.threads.getById.refetch({ id: threadId });
+            })();
         }
         catch (err) {
             setUl(false);
             console.log('reply err')
         }
-    }, [img, replyMut, tCtx.threads.getById, threadId, txt, setTxt]);
+    }, [handleSubmit, replyMut, resetForm, setError, tCtx.threads.getById, threadId]);
 
     return (
-        <>
-            <form onSubmit={e => { e.preventDefault(); submit(); }} className="flex flex-col gap-1.5 items-center px-2">
-                <textarea ref={txtFieldRef} placeholder="Reply text" value={txt} onChange={e => setTxt(e.target.value)} className="outline-none p-1 resize-none rounded-sm shadow-md aspect-video w-full max-w-[400px]" />
+        <div className="flex items-center justify-center flex-col">
+            <form onSubmit={e => { e.preventDefault(); submit(); }} className="w-full max-w-[500px] gap-1.5 px-2 grid grid-cols-12 bg-brownmain-700 text-white p-2 rounded-md">
+
+                <label className="col-span-3 text-brownmain-200 font-bold" htmlFor="replyText">Reply text</label>
+                <textarea {...register('replyText', {
+                    disabled: replyMut.isLoading || ul,
+                    maxLength: { value: 1000, message: 'Maximum length is 1000' }
+                })} placeholder="Reply text" className="col-span-9 outline-none p-1 resize-none rounded-sm shadow-md aspect-video bg-brownmain-50 text-black" />
+                {errors.replyText?.message && <span className="col-start-4 col-span-9 text-red-500">{errors.replyText?.message}</span>}
+
+                <label className="col-span-3 text-brownmain-200 font-bold" htmlFor="media">Image</label>
                 <input
+                    {...register('media', {
+                        disabled: replyMut.isLoading || ul,
+                        validate: files => {
+                            if (files.length > 1) {
+                                return 'Only one image can be selected';
+                            }
+                            const f = files[0];
+                            if (!f) { return true; }
+                            else if (!['image/jpeg', 'image/png', 'image/webp'].includes(f.type)) {
+                                return 'File needs to be JPG, PNG or WEBP';
+                            }
+                            else {
+                                return true;
+                            }
+                        }
+                    })}
+                    className="col-span-9"
                     type="file"
-                    onChange={e => {
-                        const f = e.target.files?.length ? e.target.files[0] || null : null;
-                        setImg(f);
-                    }}
                     accept="image/jpeg,image/png,image/webp"
                 />
-                <input disabled={replyMut.isLoading || ul} type="submit" value={replyMut.isLoading || ul ? "Submitting..." : "Add reply"} className="rounded-md px-2 py-1 shadow-md cursor-pointer bg-brownmain-50 disabled:cursor-wait" />
+                {ul && <div className="col-span-full">
+                    <ProgressBar progress={Math.round(ulPrg * 100)} />
+                </div>}
+                {errors.media?.message && <span className="col-start-4 col-span-9 text-red-500">{errors.media?.message}</span>}
+
+                <input disabled={replyMut.isLoading || ul} type="submit" value={replyMut.isLoading || ul ? "Submitting..." : "Add reply"} className="col-span-12 rounded-md px-2 py-1 shadow-md cursor-pointer bg-brownmain-50 disabled:cursor-wait text-black font-bold" />
             </form>
             {replyMut.error?.message && <div className="font-bold text-center text-lg text-red-600">{prettyError(replyMut.error?.message)}</div>}
-        </>
+        </div>
     )
 }
 
