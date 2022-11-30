@@ -3,14 +3,65 @@ import { Resize } from '@cloudinary/url-gen/actions/resize';
 import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from 'next/router';
 import type { ReactNodeArray } from "react";
 import { memo, useEffect, useMemo, useState } from "react";
+import { usePopperTooltip } from 'react-popper-tooltip';
+import 'react-popper-tooltip/dist/styles.css';
 import Spotify from 'react-spotify-embed';
 import reactStringReplace from "react-string-replace";
 import YouTube from "react-youtube";
 import { myCld } from "../../utils/cloudinary";
 import { PrettyDateComment as PrettyDateTimeComment } from "../../utils/prettyDate";
+import { trpc } from '../../utils/trpc';
 import styles from './Comment.module.css';
+
+interface QuoteReplyHighlightProps {
+  id: string
+}
+
+function QuoteReplyHighlight({ id }: QuoteReplyHighlightProps) {
+
+  const replyQ = trpc.threads.getThreadOrCommentById.useQuery({ id });
+
+  const boardName = useMemo(() => {
+    return replyQ.data?.comment?.thread.board.name || replyQ.data?.thread?.board.name || undefined;
+  }, [replyQ.data?.comment?.thread.board.name, replyQ.data?.thread?.board.name]);
+
+  const threadId = useMemo(() => {
+    return replyQ.data?.comment?.threadId || replyQ.data?.thread?.id || undefined;
+  }, [replyQ.data?.comment?.threadId, replyQ.data?.thread?.id]);
+
+  const commentId = useMemo(() => {
+    return replyQ.data?.comment?.id || replyQ.data?.thread?.id || undefined;
+  }, [replyQ.data?.comment?.id, replyQ.data?.thread?.id]);
+
+  const full = useMemo(() => {
+    return replyQ.data?.comment || replyQ.data?.thread || undefined;
+  }, [replyQ.data?.comment, replyQ.data?.thread]);
+
+  const { setTriggerRef, visible, setTooltipRef, getTooltipProps, getArrowProps } = usePopperTooltip({ placement: 'top' });
+
+  return (
+    <>
+      <Link href={`/${boardName}/thread/${threadId}#${commentId}`}>
+        <span ref={setTriggerRef} className="text-red-700 hover:underline cursor-pointer">{">>"}{id}</span>
+      </Link>
+
+      {full && visible && (
+        <div
+          ref={setTooltipRef}
+          {...getTooltipProps({ className: 'tooltip-container' })}
+          className="p-0 "
+        >
+          <Comment {...full} isReply isQuoteTT />
+          <div {...getArrowProps({ className: 'tooltip-arrow' })} />
+        </div>)
+      }
+    </>
+  )
+}
+
 export interface ReplyProps {
   id: string;
   timestamp: Date;
@@ -22,6 +73,7 @@ export interface ReplyProps {
   author?: Author | null;
   onIdClick?: (id: string) => void;
   onDelClick?: (id: string) => void;
+  isQuoteTT?: boolean;
 }
 
 interface Author {
@@ -51,12 +103,17 @@ export function CommentTextToRichText(text: string | undefined | null) {
 
   /* add links to replies */
   formatted = reactStringReplace(formatted, /(>>.*\s?)/g, (match, i) => {
+    const id = match.replace('>>', '');
+
     return (
+      <QuoteReplyHighlight key={match + i + (iFake++)} id={id} />
+    )
+    /* return (
       <Link key={match + i + (iFake++)} href={`#${match.replace('>>', '')}`}>
         <span key={match + i + (iFake++)} className="text-red-700 hover:underline cursor-pointer">
           {match}
         </span>
-      </Link>)
+      </Link>) */
   });
 
   /* replace color quotes */
@@ -103,9 +160,17 @@ export const Comment = memo(function Comment({
   author,
   subject,
   onIdClick,
-  onDelClick
+  onDelClick,
+  isQuoteTT
 }: ReplyProps) {
   /* const [imgDim, setImgDim] = useState({ w: 200, h: 200 }); */
+  const router = useRouter();
+
+  const isCurrent = useMemo(() => {
+    const hashId = router.asPath.split('#')[1];
+    return hashId && hashId == id;
+  }, [id, router.asPath]);
+
   const [imgExt, setImgExt] = useState(false);
 
   const [isMounted, setIsMounted] = useState(false);
@@ -116,7 +181,6 @@ export const Comment = memo(function Comment({
   const formattedText = useMemo(() => CommentTextToRichText(text), [text]);
 
   const cldImg = useMemo(() => {
-    console.log(image)
     if (!image) {
       return undefined;
     }
@@ -133,10 +197,13 @@ export const Comment = memo(function Comment({
 
   return (
     <div className="flex gap-1" id={id}>
-      {isReply && <div className="text-xs text-brownmain-800 hidden sm:block">{">>"}</div>}
+      {isReply && !isQuoteTT && <div className="text-xs text-brownmain-800 hidden sm:block">{">>"}</div>}
       <div
-        className={clsx("flex flex-wrap items-start gap-2 p-2 flex-1 sm:flex-initial", {
-          "rounded-sm bg-brownmain-300/80 shadow-md": isReply,
+        className={clsx("flex flex-wrap items-start gap-2 p-2 flex-1 sm:flex-initial rounded-sm", {
+          "bg-brownmain-300": isReply,
+          "shadow-md": isReply && !isQuoteTT,
+          "shadow-xl": isQuoteTT,
+          "bg-red-400": isCurrent && !isQuoteTT,
           "flex-col": imgExt,
           "flex-col sm:flex-row": !imgExt
         })}
@@ -161,9 +228,15 @@ export const Comment = memo(function Comment({
             {subject && (
               <div className="font-bold text-blue-800">{subject}</div>
             )}
-            {author?.image && <Image src={author.image} alt="" width={24} height={24} className="object-contain rounded-full" />}
+            {author?.image && (
+              <Link href={`/user/${author.id}`}>
+                <Image src={author.image} alt="" width={24} height={24} className="object-contain rounded-full" />
+              </Link>
+            )}
             {author ? (
-              <div className="flex-1 font-bold text-purple-800 gap-0.5 ">{author.name}</div>
+              <Link href={`/user/${author.id}`}>
+                <div className="flex-1 font-bold text-purple-800 gap-0.5 ">{author.name}</div>
+              </Link>
             ) : (
               <div className="flex-1 font-bold text-green-700">Anonymous</div>
             )}

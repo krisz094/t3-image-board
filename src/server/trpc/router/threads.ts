@@ -120,4 +120,50 @@ export const threadsRouter = router({
 
       return comment;
     }),
+  getThreadOrCommentById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const comment = await ctx.prisma.comment.findFirst({
+        where: {
+          deleted: false,
+          id: input.id,
+        },
+        include: {
+          thread: {
+            select: {
+              id: true,
+              board: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (comment) {
+        return { comment };
+      }
+
+      const thread = await ctx.prisma.thread.findFirst({
+        where: {
+          deleted: false,
+          id: input.id,
+        },
+        include: {
+          board: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+
+      if (thread) {
+        return { thread };
+      }
+
+      return null;
+    }),
 });
