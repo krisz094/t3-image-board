@@ -2,11 +2,11 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { trpc } from "../../utils/trpc";
 
-interface BoardsHeadProps {
+interface BoardsListHeadProps {
   isCatalog?: boolean;
 }
 
-export function BoardsHead({ isCatalog }: BoardsHeadProps) {
+export function BoardsListHead({ isCatalog }: BoardsListHeadProps) {
   const { data: sessionData } = useSession();
 
   const boardsQ = trpc.boards.getAll.useQuery();

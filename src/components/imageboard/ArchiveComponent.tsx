@@ -1,5 +1,6 @@
 import { trpc } from "../../utils/trpc";
-import { BoardsHead } from "./BoardsHead";
+import { BoardNameDesc } from "./BoardNameDesc";
+import { BoardsListHead } from "./BoardsListHead";
 import { HorizontalLine } from "./HorizontalLine";
 
 interface ArchiveComponentProps {
@@ -12,13 +13,8 @@ function ArchiveComponent({ boardName }: ArchiveComponentProps) {
 
     return (
         <div className="p-2 space-y-2 w-full">
-            <BoardsHead />
-
-            <h1 className="font-bold text-3xl text-center w-full">
-                <span className="font-bold">/{boardQ.data?.name}/</span>
-                <span> - </span>
-                <span>{boardQ.data?.description}</span>
-            </h1>
+            <BoardsListHead />
+            <BoardNameDesc desc={boardQ.data?.description} name={boardQ.data?.name} />
 
             <HorizontalLine />
         </div>

@@ -3,7 +3,8 @@ import Link from "next/link";
 import { memo, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { trpc } from "../../utils/trpc";
-import { BoardsHead } from "./BoardsHead";
+import { BoardNameDesc } from "./BoardNameDesc";
+import { BoardsListHead } from "./BoardsListHead";
 import { Comment } from "./Comment";
 import { HorizontalLine } from "./HorizontalLine";
 import ThreadCompose from "./ThreadCompose";
@@ -53,13 +54,8 @@ const BoardComponent = memo(function BoardComp({
 
   return (
     <div className="w-full space-y-2 p-2">
-      <BoardsHead />
-
-      <h1 className="font-sans font-bold text-red-800 text-3xl text-center w-full ">
-        <span>/{boardQ.data?.name}/</span>
-        <span> - </span>
-        <span>{boardQ.data?.description}</span>
-      </h1>
+      <BoardsListHead />
+      <BoardNameDesc desc={boardQ.data?.description} name={boardQ.data?.name} />
 
       <FormProvider {...formMethods}>
         <ThreadCompose boardName={boardName} />

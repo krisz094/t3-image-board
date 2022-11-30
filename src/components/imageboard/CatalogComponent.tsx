@@ -7,7 +7,8 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { myCld } from "../../utils/cloudinary";
 import { trpc } from "../../utils/trpc";
 import type { ThreadFormProps } from './BoardComponent';
-import { BoardsHead } from "./BoardsHead";
+import { BoardNameDesc } from './BoardNameDesc';
+import { BoardsListHead } from "./BoardsListHead";
 import { HorizontalLine } from "./HorizontalLine";
 import ThreadCompose from "./ThreadCompose";
 
@@ -76,13 +77,8 @@ function CatalogComponent({ boardName }: CatalogComponentProps) {
 
   return (
     <div className="w-full space-y-2 p-2">
-      <BoardsHead isCatalog />
-
-      <h1 className="w-full text-center text-3xl font-bold">
-        <span className="font-bold">/{boardQ.data?.name}/</span>
-        <span> - </span>
-        <span>{boardQ.data?.description}</span>
-      </h1>
+      <BoardsListHead isCatalog />
+      <BoardNameDesc desc={boardQ.data?.description} name={boardQ.data?.name} />
 
       <FormProvider {...formMethods}>
         <ThreadCompose boardName={boardName} />

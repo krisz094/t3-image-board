@@ -3,7 +3,8 @@ import { useRouter } from "next/router";
 import { memo, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { trpc } from "../../utils/trpc";
-import { BoardsHead } from "./BoardsHead";
+import { BoardNameDesc } from "./BoardNameDesc";
+import { BoardsListHead } from "./BoardsListHead";
 import { Comment } from "./Comment";
 import { HorizontalLine } from "./HorizontalLine";
 import ReplyCompose from "./ReplyCompose";
@@ -55,14 +56,8 @@ const ThreadComponent = memo(function ThreadComp({ threadId, boardName }: { thre
 
     return (
         <div className="min-h-[100vh] bg-gradient-to-b from-brownmain-100 to-brownmain-200 p-2 space-y-2">
-
-            <BoardsHead />
-
-            <h1 className="font-sans font-bold text-red-800 text-3xl text-center w-full ">
-                <span>/{boardQ.data?.name}/</span>
-                <span> - </span>
-                <span>{boardQ.data?.description}</span>
-            </h1>
+            <BoardsListHead />
+            <BoardNameDesc desc={boardQ.data?.description} name={boardQ.data?.name} />
 
             <FormProvider {...formMethods} >
                 <ReplyCompose threadId={threadId} />
@@ -126,5 +121,3 @@ const ThreadComponent = memo(function ThreadComp({ threadId, boardName }: { thre
 })
 
 export default ThreadComponent;
-
-
