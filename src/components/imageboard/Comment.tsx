@@ -182,7 +182,7 @@ export const Comment = memo(function Comment({
             )}
             {onDelClick && <div className="font-bold text-red-500 cursor-pointer hover:scale-110" onClick={() => onDelClick(id)}>X</div>}
           </div>
-          <div>
+          <div style={{ wordBreak: 'break-word' }}>
             {formattedText}
           </div>
         </div>
