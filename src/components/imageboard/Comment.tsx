@@ -1,4 +1,4 @@
-import { AdvancedImage, placeholder } from '@cloudinary/react';
+import { AdvancedImage } from '@cloudinary/react';
 import { Resize } from '@cloudinary/url-gen/actions/resize';
 import clsx from "clsx";
 import Image from "next/image";
@@ -153,7 +153,7 @@ export const Comment = memo(function Comment({
               }
             }}
           >
-            <AdvancedImage cldImg={cldImg} plugins={[placeholder(/* { mode: 'blur' } */)]} />
+            <AdvancedImage cldImg={cldImg} />
           </div>
         )}
         <div className="flex flex-1 flex-col gap-2">

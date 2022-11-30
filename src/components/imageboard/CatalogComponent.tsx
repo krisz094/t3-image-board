@@ -1,4 +1,4 @@
-import { AdvancedImage, placeholder } from '@cloudinary/react';
+import { AdvancedImage } from '@cloudinary/react';
 import { Resize } from '@cloudinary/url-gen/actions/resize';
 import type { User } from "@prisma/client";
 import Link from "next/link";
@@ -38,7 +38,7 @@ function CatalogThread(props: CatalogThreadProps) {
     <div key={props.id} className="flex flex-col items-center leading-tight">
       <Link href={`/${props.boardName}/thread/${props.id}`}>
         <div className="cursor-pointer object-contain shadow-md transition-all hover:scale-105">
-          <AdvancedImage cldImg={cldImg} plugins={[placeholder(/* { mode: 'blur' } */)]} />
+          <AdvancedImage cldImg={cldImg} />
         </div>
       </Link>
       <div>
