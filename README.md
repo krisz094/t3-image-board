@@ -31,6 +31,10 @@ A simple image board implemented with the [T3 stack](https://create.t3.gg/).
 - [x] Spoiler tags - Single Line
 - [x] Admin role (Mid prio) - *ADMIN_EMAIL can remove threads/posts (soft delete + purge soft deleted threads from admin panel)*
 - [x] Admin/Moderation subsite (Mid prio) - *Basic version for now*
+- [ ] IP (Range) Ban
+- [ ] Video upload
+- [ ] Multiple media upload per post
+- [ ] Reactions to posts
 
 ## Pictures 
 
