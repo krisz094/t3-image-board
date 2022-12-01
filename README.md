@@ -1,13 +1,22 @@
 # T3 Image Board
 
-A simple image board implemented with the T3 stack. 
+A simple image board implemented with the [T3 stack](https://create.t3.gg/).
+
+## Stack
+
+- TypeScript
+- TailwindCSS
+- tRPC
+- Prisma
+- NextJS
+- Cloudinary for media uploads
 
 ## TODO
 
 - [x] Boards
 - [x] Threads
 - [x] Commenting
-- [x] Log IP and other data of comments for legal reasons
+- [x] Log IP for threads/comments for legal reasons
 - [ ] Ability to delete own comment/thread when logged in (with password)
 - [x] Catalog
 - [ ] Archive (High prio)
