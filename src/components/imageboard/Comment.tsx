@@ -16,11 +16,7 @@ import { PrettyDateComment as PrettyDateTimeComment } from "../../utils/prettyDa
 import { trpc } from "../../utils/trpc";
 import styles from "./Comment.module.css";
 
-interface QuoteReplyHighlightProps {
-  id: string;
-}
-
-function QuoteReplyHighlight({ id }: QuoteReplyHighlightProps) {
+function useGetCommentIdProps(id: string) {
   const replyQ = trpc.threads.getThreadOrCommentById.useQuery({ id }, { refetchOnWindowFocus: false, staleTime: 60000 });
 
   const notExist = useMemo(
@@ -57,12 +53,31 @@ function QuoteReplyHighlight({ id }: QuoteReplyHighlightProps) {
     return !!replyQ.data?.thread;
   }, [replyQ.data?.thread]);
 
+  return {
+    notExist,
+    boardName,
+    threadId,
+    commentId,
+    full,
+    isOP
+  };
+}
+
+
+interface QuoteReplyHighlightProps {
+  id: string;
+  small?: boolean;
+}
+
+function QuoteReplyHighlight({ id, small }: QuoteReplyHighlightProps) {
+
+  const { boardName, commentId, full, isOP, notExist, threadId } = useGetCommentIdProps(id);
+
   const {
     setTriggerRef,
     visible,
     setTooltipRef,
     getTooltipProps,
-    getArrowProps,
   } = usePopperTooltip({ placement: "top" });
 
   return (
@@ -72,9 +87,13 @@ function QuoteReplyHighlight({ id }: QuoteReplyHighlightProps) {
       >
         <span
           ref={setTriggerRef}
-          className={clsx("mr-1 cursor-pointer", {
-            "text-red-700 underline hover:text-red-600": full,
-            "text-gray-600 line-through": notExist,
+          className={clsx({
+            "mr-1": !small,
+            "text-xs mr-0": small,
+            "text-red-700 underline hover:text-red-600": !notExist && !small,
+            "text-blue-600 ": !notExist && small,
+            "underline cursor-pointer": !notExist,
+            "text-gray-600 line-through cursor-not-allowed": notExist,
           })}
         >
           {">>"}
@@ -99,21 +118,6 @@ function QuoteReplyHighlight({ id }: QuoteReplyHighlightProps) {
     </>
   );
 }
-
-export interface ReplyProps {
-  id: string;
-  timestamp: Date;
-  text?: string | null;
-  subject?: string | null;
-  image?: string | null;
-  boardName?: string;
-  isReply?: boolean;
-  author?: Author | null;
-  onIdClick?: (id: string) => void;
-  onDelClick?: (id: string) => void;
-  isQuoteTT?: boolean;
-}
-
 interface Author {
   id?: string | null;
   name?: string | null;
@@ -215,6 +219,22 @@ export function CommentTextToRichText(text: string | undefined | null) {
   return formatted;
 }
 
+export interface ReplyProps {
+  id: string;
+  timestamp: Date;
+  text?: string | null;
+  subject?: string | null;
+  image?: string | null;
+  boardName?: string;
+  isReply?: boolean;
+  author?: Author | null;
+  onIdClick?: (id: string) => void;
+  onDelClick?: (id: string) => void;
+  isQuoteTT?: boolean;
+  replies?: string[];
+}
+
+
 export const Comment = memo(function Comment({
   id,
   image,
@@ -227,6 +247,7 @@ export const Comment = memo(function Comment({
   onIdClick,
   onDelClick,
   isQuoteTT,
+  replies,
 }: ReplyProps) {
   /* const [imgDim, setImgDim] = useState({ w: 200, h: 200 }); */
   const router = useRouter();
@@ -313,7 +334,7 @@ export const Comment = memo(function Comment({
                 </div>
               </Link>
             ) : (
-              <div className="flex-1 font-bold text-green-700">Anonymous</div>
+              <div className="font-bold text-green-700">Anonymous</div>
             )}
             {isMounted && <div>{PrettyDateTimeComment(timestamp)}</div>}
             <div
@@ -322,6 +343,7 @@ export const Comment = memo(function Comment({
             >
               No. {id}
             </div>
+
             {boardName && (
               <Link href={`/${boardName}/thread/${id}`}>
                 <div className="group">
@@ -333,6 +355,7 @@ export const Comment = memo(function Comment({
                 </div>
               </Link>
             )}
+
             {onDelClick && (
               <div
                 className="cursor-pointer font-bold text-red-500 hover:scale-110"
@@ -341,6 +364,12 @@ export const Comment = memo(function Comment({
                 X
               </div>
             )}
+
+
+            {replies?.map(x => (
+              <QuoteReplyHighlight key={x} small id={x} />
+            ))}
+
           </div>
           <div style={{ wordBreak: "break-word" }}>{formattedText}</div>
         </div>

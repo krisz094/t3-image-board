@@ -32,6 +32,25 @@ const ThreadComponent = memo(function ThreadComp({
 
   const isAdmin = useMemo(() => !!isAdminQ.data, [isAdminQ.data]);
 
+  const gatheredReplies: Map<string, string[]> = useMemo(() => {
+    const map = new Map<string, string[]>();
+
+    threadQ.data?.comments.forEach(x => {
+      if (x.text) {
+        const quotedIdSet = new Set(x.text.match(/>>[a-zA-Z0-9]*/g)?.map(x => x.replace('>>', '')));
+        quotedIdSet.forEach((otherId) => {
+
+          map.set(otherId, [...(map.get(otherId) || []), x.id])
+
+        })
+      }
+    })
+
+    /* console.log(map) */
+
+    return map;
+  }, [threadQ.data?.comments]);
+
   /* Mutations */
   const delThreadMut = trpc.admin.delThread.useMutation({
     onSuccess: async () => {
@@ -119,6 +138,7 @@ const ThreadComponent = memo(function ThreadComp({
             onDelClick={
               isAdmin ? (id) => delThreadMut.mutate({ id }) : undefined
             }
+            replies={gatheredReplies.get(threadQ.data.id)}
           />
         )}
 
@@ -141,6 +161,7 @@ const ThreadComponent = memo(function ThreadComp({
             onDelClick={
               isAdmin ? (id) => delCommentMut.mutate({ id }) : undefined
             }
+            replies={gatheredReplies.get(x.id)}
           />
         ))}
       </div>
