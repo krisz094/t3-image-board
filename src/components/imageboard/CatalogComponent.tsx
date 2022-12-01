@@ -75,8 +75,8 @@ interface CatalogComponentProps {
 function CatalogComponent({ boardName }: CatalogComponentProps) {
   const formMethods = useForm<ThreadFormProps>();
 
-  const boardQ = trpc.boards.getByName.useQuery({ boardName });
-  const catalogQ = trpc.boards.getCatalogThreads.useQuery({ boardName });
+  const boardQ = trpc.boards.getByName.useQuery({ boardName }, { refetchOnWindowFocus: false, staleTime: 60000 });
+  const catalogQ = trpc.boards.getCatalogThreads.useQuery({ boardName }, { refetchOnWindowFocus: false, staleTime: 60000 });
 
   return (
     <div className="w-full space-y-2 p-2">

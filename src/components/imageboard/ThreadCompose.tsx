@@ -50,7 +50,7 @@ function ThreadCompose({ boardName, }: ThreadComposeProps) {
             <form onSubmit={e => { e.preventDefault(); submit(); }} className="w-full max-w-[500px] gap-1.5 px-2 grid grid-cols-12 bg-brownmain-700 text-white p-2 rounded-md">
 
                 <label className="col-span-12 sm:col-span-3 text-brownmain-200 font-bold" htmlFor="subject">Subject</label>
-                <input {...register('subject', {
+                <input id="subject" {...register('subject', {
                     disabled: createThreadMut.isLoading || ul,
                     maxLength: { value: 1000, message: 'Maximum length is 1000' }
                 })} className="col-span-12 sm:col-span-9 outline-none p-1 resize-none rounded-sm shadow-md  bg-brownmain-50 text-black" />
@@ -58,6 +58,7 @@ function ThreadCompose({ boardName, }: ThreadComposeProps) {
 
                 <label className="col-span-12 sm:col-span-3 text-brownmain-200 font-bold" htmlFor="replyText">Thread text</label>
                 <textarea
+                    id="replyText"
                     {...register('replyText', {
                         disabled: createThreadMut.isLoading || ul,
                         maxLength: { value: 1000, message: 'Maximum length is 1000' },
@@ -69,6 +70,7 @@ function ThreadCompose({ boardName, }: ThreadComposeProps) {
 
                 <label className="col-span-12 sm:col-span-3 text-brownmain-200 font-bold" htmlFor="media">Image</label>
                 <input
+                    id="media"
                     {...register('media', {
                         disabled: createThreadMut.isLoading || ul,
                         required: 'An image is required',

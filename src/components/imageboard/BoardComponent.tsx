@@ -27,10 +27,11 @@ const BoardComponent = memo(function BoardComp({
   const formMethods = useForm<ThreadFormProps>();
 
   /* Queries */
-  const boardQ = trpc.boards.getByName.useQuery({ boardName });
-  const pageNumQ = trpc.boards.getPageNum.useQuery({ boardName });
-  const threadsQ = trpc.boards.getPage.useQuery({ boardName, pageNum });
-  const isAdminQ = trpc.admin.isCurrUserAdmin.useQuery();
+  const boardQ = trpc.boards.getByName.useQuery({ boardName }, { refetchOnWindowFocus: false, staleTime: 60000 });
+  const pageNumQ = trpc.boards.getPageNum.useQuery({ boardName }, { refetchOnWindowFocus: false, staleTime: 60000 });
+  const isAdminQ = trpc.admin.isCurrUserAdmin.useQuery(undefined, { refetchOnWindowFocus: false, staleTime: 60000 });
+  const threadsQ = trpc.boards.getPage.useQuery({ boardName, pageNum }, { staleTime: 1000, refetchOnWindowFocus: false });
+
   const isAdmin = useMemo(() => !!isAdminQ.data, [isAdminQ.data]);
 
   /* Mutations */

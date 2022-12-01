@@ -9,7 +9,7 @@ interface BoardsListHeadProps {
 export function BoardsListHead({ isCatalog }: BoardsListHeadProps) {
   const { data: sessionData } = useSession();
 
-  const boardsQ = trpc.boards.getAll.useQuery();
+  const boardsQ = trpc.boards.getAll.useQuery(undefined, { refetchOnWindowFocus: false, staleTime: 60000 });
 
   return (
     <div className="flex w-full gap-2 text-sm">

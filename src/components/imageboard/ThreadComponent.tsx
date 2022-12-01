@@ -25,9 +25,11 @@ const ThreadComponent = memo(function ThreadComp({
 
   const formMethods = useForm<ReplyFormProps>();
   const trpcC = trpc.useContext();
-  const boardQ = trpc.boards.getByName.useQuery({ boardName });
-  const threadQ = trpc.threads.getById.useQuery({ id: threadId, boardName });
-  const isAdminQ = trpc.admin.isCurrUserAdmin.useQuery();
+
+  const boardQ = trpc.boards.getByName.useQuery({ boardName }, { refetchOnWindowFocus: false, staleTime: 60000 });
+  const isAdminQ = trpc.admin.isCurrUserAdmin.useQuery(undefined, { refetchOnWindowFocus: false, staleTime: 60000 });
+  const threadQ = trpc.threads.getById.useQuery({ id: threadId, boardName }, { staleTime: 1000, refetchInterval: 30000, refetchIntervalInBackground: false });
+
   const isAdmin = useMemo(() => !!isAdminQ.data, [isAdminQ.data]);
 
   /* Mutations */

@@ -36,8 +36,8 @@ function ReplyCompose({ threadId }: Props) {
         vals.media[0] && setUl(true);
         const imgResp = vals.media[0]
           ? await postImage(vals.media[0], ({ progress }) => {
-              setUlPrg(progress);
-            })
+            setUlPrg(progress);
+          })
           : undefined;
         vals.media[0] && setUl(false);
 
@@ -86,6 +86,7 @@ function ReplyCompose({ threadId }: Props) {
           Reply text
         </label>
         <textarea
+          id="replyText"
           {...register("replyText", {
             disabled: replyMut.isLoading || ul,
             maxLength: { value: 1000, message: "Maximum length is 1000" },
@@ -105,6 +106,7 @@ function ReplyCompose({ threadId }: Props) {
           Image
         </label>
         <input
+          id="media"
           {...register("media", {
             disabled: replyMut.isLoading || ul,
             validate: (files) => {

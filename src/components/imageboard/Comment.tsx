@@ -21,7 +21,7 @@ interface QuoteReplyHighlightProps {
 }
 
 function QuoteReplyHighlight({ id }: QuoteReplyHighlightProps) {
-  const replyQ = trpc.threads.getThreadOrCommentById.useQuery({ id });
+  const replyQ = trpc.threads.getThreadOrCommentById.useQuery({ id }, { refetchOnWindowFocus: false, staleTime: 60000 });
 
   const notExist = useMemo(
     () => replyQ.isFetched && !replyQ.data,
@@ -87,13 +87,13 @@ function QuoteReplyHighlight({ id }: QuoteReplyHighlightProps) {
         <div
           ref={setTooltipRef}
           {...getTooltipProps({ className: "tooltip-container" })}
-          className="m-2 overflow-hidden rounded-md border-[1px] border-brownmain-700 shadow-xl"
+          className="overflow-hidden rounded-md border-[1px] border-brownmain-700 shadow-xl"
         >
+
           {full && <Comment {...full} isReply isQuoteTT />}
           {notExist && (
-            <div className="bg-brownmain-400 p-2">Post not found.</div>
+            <div className="bg-brownmain-400 p-2 ">Post not found.</div>
           )}
-          <div {...getArrowProps({ className: "tooltip-arrow" })} />
         </div>
       )}
     </>
