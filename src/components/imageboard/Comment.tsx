@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactNodeArray } from "react";
 import { memo, useEffect, useMemo, useState } from "react";
+import ReactDOM from 'react-dom';
 import { usePopperTooltip } from "react-popper-tooltip";
 import "react-popper-tooltip/dist/styles.css";
 import Spotify from "react-spotify-embed";
@@ -78,7 +79,7 @@ function QuoteReplyHighlight({ id, small }: QuoteReplyHighlightProps) {
     visible,
     setTooltipRef,
     getTooltipProps,
-  } = usePopperTooltip({ placement: "top" });
+  } = usePopperTooltip({ placement: "top", followCursor: true });
 
   return (
     <>
@@ -103,17 +104,25 @@ function QuoteReplyHighlight({ id, small }: QuoteReplyHighlightProps) {
       </Link>
 
       {visible && (
-        <div
-          ref={setTooltipRef}
-          {...getTooltipProps({ className: "tooltip-container" })}
-          className="overflow-hidden rounded-md border-[1px] border-brownmain-700 shadow-xl"
-        >
+        ReactDOM.createPortal((
+          <div
+            ref={setTooltipRef}
+            {...getTooltipProps({
+              className: "tooltip-container", style: {
+                border: '1px solid black',
+                borderRadius: 6,
+                padding: 0,
+                overflow: "hidden"
+              }
+            })}
+          >
 
-          {full && <Comment {...full} isReply isQuoteTT />}
-          {notExist && (
-            <div className="bg-brownmain-400 p-2 ">Post not found.</div>
-          )}
-        </div>
+            {full && <Comment {...full} isReply isQuoteTT />}
+            {notExist && (
+              <div className="bg-brownmain-400 p-2 ">Post not found.</div>
+            )}
+          </div>
+        ), document.body)
       )}
     </>
   );
@@ -252,9 +261,11 @@ export const Comment = memo(function Comment({
   /* const [imgDim, setImgDim] = useState({ w: 200, h: 200 }); */
   const router = useRouter();
 
-  const isCurrent = useMemo(() => {
+  const [isCurrent, setIsCurrent] = useState(false)
+
+  useEffect(() => {
     const hashId = router.asPath.split("#")[1];
-    return hashId && hashId == id;
+    setIsCurrent(!!hashId && hashId == id);
   }, [id, router.asPath]);
 
   const [imgExt, setImgExt] = useState(false);
