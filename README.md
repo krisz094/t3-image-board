@@ -20,6 +20,7 @@ A simple image board implemented with the [T3 stack](https://create.t3.gg/).
 - [ ] Ability to delete own comment/thread when logged in (with password)
 - [x] Catalog
 - [ ] Archive (High prio)
+- [x] YouTube and Spotify embeds
 - [x] Quoting style
 - [x] Login with Discord (other providers maybe soon)
 - [x] User page (Threads, comments, etc) (Low prio) - Basic version for now
@@ -63,4 +64,10 @@ A simple image board implemented with the [T3 stack](https://create.t3.gg/).
 ![image](https://user-images.githubusercontent.com/13174664/205099071-61ca04c5-2dbb-441f-9e5a-64813b9e1422.png)
 
 ![image](https://user-images.githubusercontent.com/13174664/205099142-a01d1ac8-3af3-48a1-8a15-96f62140b308.png)
+
+### Youtube and Spotify embeds
+
+![kép](https://user-images.githubusercontent.com/13174664/205104727-fe3a7f43-dfe9-4b46-b5e9-341790243caa.png)
+
+![kép](https://user-images.githubusercontent.com/13174664/205104786-ecc82b63-86f5-4358-b6b1-ecde3530c9e7.png)
 
