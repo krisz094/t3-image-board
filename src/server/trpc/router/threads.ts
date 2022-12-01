@@ -31,10 +31,10 @@ export const threadsRouter = router({
           subject: input.subject,
           author: currUserId
             ? {
-                connect: {
-                  id: currUserId,
-                },
-              }
+              connect: {
+                id: currUserId,
+              },
+            }
             : undefined,
         },
       });
@@ -129,6 +129,7 @@ export const threadsRouter = router({
           id: input.id,
         },
         include: {
+          author: true,
           thread: {
             select: {
               id: true,

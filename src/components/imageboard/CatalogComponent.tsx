@@ -1,13 +1,13 @@
-import { AdvancedImage } from '@cloudinary/react';
-import { Resize } from '@cloudinary/url-gen/actions/resize';
+import { AdvancedImage } from "@cloudinary/react";
+import { Resize } from "@cloudinary/url-gen/actions/resize";
 import type { User } from "@prisma/client";
 import Link from "next/link";
 import { useMemo } from "react";
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm } from "react-hook-form";
 import { myCld } from "../../utils/cloudinary";
 import { trpc } from "../../utils/trpc";
-import type { ThreadFormProps } from './BoardComponent';
-import { BoardNameDesc } from './BoardNameDesc';
+import type { ThreadFormProps } from "./BoardComponent";
+import { BoardNameDesc } from "./BoardNameDesc";
 import { BoardsListHead } from "./BoardsListHead";
 import { HorizontalLine } from "./HorizontalLine";
 import ThreadCompose from "./ThreadCompose";
@@ -28,7 +28,6 @@ interface CatalogThreadProps {
 }
 
 function CatalogThread(props: CatalogThreadProps) {
-
   const cldImg = useMemo(() => {
     const img = myCld.image(props.image);
 
@@ -57,12 +56,16 @@ function CatalogThread(props: CatalogThreadProps) {
         <div className="font-bold text-blue-800">{props.subject}</div>
       )}
       <div className="text-xs font-thin">
-        R: {props.comments.length} | I:{" "}
-        {props.comments.filter((x) => !!x.image).length}
+        R: <span className="font-bold">{props.comments.length}</span> / I:{" "}
+        <span className="font-bold">
+          {props.comments.filter((x) => !!x.image).length}
+        </span>
       </div>
-      <div>{props.text?.slice(0, 100)}</div>
+      <div className="text-sm" style={{ wordBreak: "break-word" }}>
+        {props.text?.slice(0, 100)}
+      </div>
     </div>
-  )
+  );
 }
 
 interface CatalogComponentProps {
@@ -112,7 +115,7 @@ function CatalogComponent({ boardName }: CatalogComponentProps) {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
           gap: 10,
         }}
       >
