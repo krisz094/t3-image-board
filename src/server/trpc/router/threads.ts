@@ -40,7 +40,7 @@ export const threadsRouter = router({
       });
     }),
   getById: publicProcedure
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ id: z.string(), boardName: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.prisma.thread.findFirst({
         where: {
@@ -48,6 +48,11 @@ export const threadsRouter = router({
           id: {
             equals: input.id,
           },
+          board: {
+            name: {
+              equals: input.boardName
+            }
+          }
         },
         select: {
           comments: {
@@ -96,7 +101,7 @@ export const threadsRouter = router({
       const currUserId = ctx.session?.user?.id;
       const ip = ctx.ip;
 
-      const [comment] = await ctx.prisma.$transaction([
+      const [comment, thread] = await ctx.prisma.$transaction([
         ctx.prisma.comment.create({
           data: {
             deleted: false,
@@ -107,6 +112,7 @@ export const threadsRouter = router({
             threadId: input.threadId,
             userId: currUserId,
           },
+
         }),
         ctx.prisma.thread.update({
           where: {
@@ -115,10 +121,17 @@ export const threadsRouter = router({
           data: {
             updatedAt: new Date(),
           },
+          include: {
+            board: {
+              select: {
+                name: true
+              }
+            }
+          }
         }),
       ]);
 
-      return comment;
+      return { comment, thread };
     }),
   getThreadOrCommentById: publicProcedure
     .input(z.object({ id: z.string() }))

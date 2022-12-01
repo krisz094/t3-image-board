@@ -1,7 +1,7 @@
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import type {
   GetServerSidePropsContext,
-  InferGetServerSidePropsType
+  InferGetServerSidePropsType,
 } from "next";
 import { getSession } from "next-auth/react";
 import Head from "next/head";
@@ -25,7 +25,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   if (!board) {
     return {
       notFound: true,
-    }
+    };
   }
 
   const threadId = context.params?.threadId as string;
@@ -33,12 +33,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   await Promise.all([
     ssg.boards.getAll.prefetch(),
     ssg.boards.getByName.prefetch({ boardName }),
-    ssg.threads.getById.prefetch({ id: threadId }),
+    ssg.threads.getById.prefetch({ id: threadId, boardName }),
   ]);
 
   context.res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=15, stale-while-revalidate=60'
+    "Cache-Control",
+    "public, s-maxage=15, stale-while-revalidate=60"
   );
 
   return {
