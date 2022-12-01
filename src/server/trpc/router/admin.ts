@@ -41,4 +41,19 @@ export const adminRouter = router({
         },
       });
     }),
+  purgeDelComAndThr: adminProcedure.mutation(async ({ ctx, input }) => {
+    const comDel = await ctx.prisma.comment.deleteMany({
+      where: {
+        deleted: true,
+      },
+    });
+
+    const thrDel = await ctx.prisma.thread.deleteMany({
+      where: {
+        deleted: true,
+      },
+    });
+
+    return { comDel, thrDel };
+  }),
 });
